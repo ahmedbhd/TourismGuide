@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Maps</string>
+    <string name="title_notifications">Favourites</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="google_maps_key">AIzaSyDbkY2fSN15Fgt8pTU6YzgcnUf-Hf5k04A</string>
+    <string name="home">Home</string>
+    <string name="title_activity_add_res">AddResActivity</string>
+    <string name="title_activity_update_res">UpdateResActivity</string>
+    <string name="title_activity_dis_res">DisResActivity</string>
+    <string name="phone">Phone</string>
+    <string name="name">Name</string>
+    <string name="heart">heart</string>
+    <string name="cancel">Cancel</string>
+    <string name="todo">TODO</string>
+    <string name="description">Description...</string>
+    <string name="title_activity_login">LoginActivity</string>
+
+</resources>

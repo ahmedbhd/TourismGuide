@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<com.daimajia.swipe.SwipeLayout xmlns:swipe="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    swipe:leftEdgeSwipeOffset="0dp"
+    swipe:rightEdgeSwipeOffset="0dp"
+    android:layout_margin="5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#fdd000"
+        android:gravity="center"
+        android:tag="Bottom3"
+        android:weightSum="10"
+        android:layout_margin="5dp">
+
+        <ImageView
+            android:id="@+id/eye"
+            android:layout_width="27dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:src="@drawable/eye2" />
+
+        <Button
+            android:id="@+id/open"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="4"
+            android:background="@drawable/white"
+            android:text="Check"
+            android:textColor="#fdd000" />
+
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="4"
+            android:background="@drawable/white"
+            android:text="Delete"
+            android:textColor="#fdd000" />
+        <ImageView
+            android:id="@+id/trash"
+            android:layout_width="27dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:src="@drawable/trash" />
+    </LinearLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/item_selector">
+
+        <ImageView
+            android:id="@+id/favimg_s"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            swipe:layout_constraintBottom_toBottomOf="parent"
+            swipe:layout_constraintStart_toStartOf="parent"
+            swipe:layout_constraintTop_toTopOf="parent"
+            swipe:srcCompat="@mipmap/ic_launcher" />
+
+
+        <TextView
+            android:id="@+id/favdec_s"
+            style="@style/titetextstyle"
+            android:layout_width="244dp"
+            android:layout_height="37dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginEnd="28dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:drawableLeft="@drawable/ic_wifi_yellow_900_24dp"
+            android:drawablePadding="4dp"
+            android:text="Nom"
+            android:textColor="#686868"
+            swipe:layout_constraintBottom_toTopOf="@+id/favpw_s"
+            swipe:layout_constraintEnd_toEndOf="parent"
+            swipe:layout_constraintStart_toEndOf="@+id/favimg_s"
+            swipe:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/favpw_s"
+            style="@style/subtitetextstyle"
+            android:layout_width="244dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="28dp"
+            android:layout_marginStart="16dp"
+            android:drawableLeft="@drawable/ic_lock_outline_green_700_24dp"
+            android:drawablePadding="4dp"
+            android:text="Nom"
+            android:textColor="#686868"
+            swipe:layout_constraintBottom_toBottomOf="parent"
+            swipe:layout_constraintEnd_toEndOf="parent"
+            swipe:layout_constraintStart_toEndOf="@+id/favimg_s" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</com.daimajia.swipe.SwipeLayout>

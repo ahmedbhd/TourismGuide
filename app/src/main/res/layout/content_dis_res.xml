@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".DisResActivity"
+    tools:showIn="@layout/activity_dis_res">
+
+
+    <ImageView
+        android:id="@+id/dislocimage_d"
+        android:layout_width="244dp"
+        android:layout_height="97dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_add_a_photo_black_24dp"
+        app:layout_constraintBottom_toTopOf="@+id/disname"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/restaurantimg"
+        android:contentDescription="@string/todo" />
+
+    <TextView
+        android:id="@+id/distlf"
+        android:layout_width="212dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical|center"
+        android:hint="@string/phone"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/disDesc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disname"
+        tools:fontFamily="casual" />
+
+    <TextView
+        android:id="@+id/disname"
+        android:layout_width="212dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:gravity="center_vertical|center"
+        android:hint="@string/name"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/distlf"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dislocimage_d"
+        tools:fontFamily="casual" />
+
+
+
+    <TextView
+        android:id="@+id/disDesc"
+        android:layout_width="242dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:maxLines="2"
+        android:fontFamily="monospace"
+        android:hint="@string/description"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/disloc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/distlf"
+        tools:ignore="MissingConstraints" />
+
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/disloc"
+        android:layout_width="396dp"
+        android:layout_height="200dp"
+
+        android:layout_marginBottom="8dp"
+        android:paddingTop="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/disfav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disDesc" />
+
+    <Button
+        android:id="@+id/disfav"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="88dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="0dp"
+        android:text="@string/heart"
+        android:textColor="@android:color/background_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disloc" />
+
+    <Button
+        android:id="@+id/disCancel"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="88dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="0dp"
+        android:text="@string/cancel"
+        android:textColor="@android:color/background_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disloc" />
+</android.support.constraint.ConstraintLayout>
