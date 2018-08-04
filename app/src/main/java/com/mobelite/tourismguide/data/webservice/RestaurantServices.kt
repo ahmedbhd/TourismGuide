@@ -1,7 +1,6 @@
-package com.mobelite.tourismguide.data
+package com.mobelite.tourismguide.data.webservice
 
 import io.reactivex.Observable
-import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -19,7 +18,7 @@ interface RestaurantServices {
                             RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .addConverterFactory(ScalarsConverterFactory.create())
-                    .baseUrl("http://192.168.1.10:3000/")
+                    .baseUrl("http://192.168.1.3:3000/")
                     .build()
 
             return retrofit.create(RestaurantServices::class.java)
@@ -61,7 +60,8 @@ interface RestaurantServices {
     fun updaterest(@Body resultRestaurant: Model.ResultRestaurant): Observable<String>
 
 
-
+    @POST("insertuser")
+    fun insertUser(@Body User: Model.User): Observable<String>
 
 
 }

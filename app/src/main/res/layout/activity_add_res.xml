@@ -16,7 +16,19 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
+
+            <TextView
+
+                android:id="@+id/addactivitytitle"
+                android:layout_width="300dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/add_restaurant"
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView.PopupMenu"
+                android:visibility="visible" />
+
+        </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 

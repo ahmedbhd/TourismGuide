@@ -28,6 +28,8 @@ import com.akexorcist.googledirection.constant.TransportMode
 import com.akexorcist.googledirection.model.Direction
 import com.akexorcist.googledirection.model.Route
 import com.akexorcist.googledirection.util.DirectionConverter
+import com.bumptech.glide.Glide
+import com.firebase.ui.storage.images.FirebaseImageLoader
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -35,20 +37,19 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
+import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
-import com.mobelite.tourismguide.data.Model
-import com.mobelite.tourismguide.data.RestaurantServices
+import com.mobelite.tourismguide.data.webservice.Model
+import com.mobelite.tourismguide.data.webservice.RestaurantServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.stream.Stream
 
 
 class MapsFragment : Fragment() ,
     OnMapReadyCallback ,
     GoogleMap.OnMarkerClickListener,
-    GoogleMap.OnInfoWindowClickListener,
-    DirectionCallback {
+    GoogleMap.OnInfoWindowClickListener{
 
 
     private val restaurantServices by lazy {
@@ -56,7 +57,7 @@ class MapsFragment : Fragment() ,
     }
     private var disposable: Disposable? = null
 
-
+    var res: Model.ResultRestaurant?=null
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private const val TAG = "LocationPickerActivity"
@@ -98,7 +99,9 @@ class MapsFragment : Fragment() ,
         @SuppressLint("InflateParams")
         override fun getInfoWindow(marker: Marker): View? {
 
-
+            val ch:String = marker.title
+            val d : String =  ch.substring(0, ch.indexOf("/"))
+            val indexloc = ch.substring(ch.indexOf("/") + 1, ch.length)
             try {
 
                 // Getting view from the layout file info_window_layout
@@ -106,7 +109,7 @@ class MapsFragment : Fragment() ,
                 popup!!.isClickable = true
                 // Getting reference to the TextView to set latitude
                 val wifiTxt = popup!!.findViewById(R.id.titleWifi) as TextView
-                wifiTxt.text=(marker. title)
+                wifiTxt.text=(d)
 
                 val passTxt = popup!!.findViewById(R.id.passworWifi) as TextView
                 passTxt.text=(marker.snippet)
@@ -115,7 +118,18 @@ class MapsFragment : Fragment() ,
 //
 //                        .load(p.getImg())
 //                        .into(imgWifi)
+                val loca : Model.ResultRestaurant = restaurants!![(Integer.valueOf(indexloc))]
 
+                if (loca.image!="no image") {
+                    val storage  = FirebaseStorage.getInstance()
+                    val storageRef = storage.reference
+                    val imageRef2 = storageRef.child(loca.image)
+                    Glide.with(context /* context */)
+                            .using(FirebaseImageLoader())
+                            .load(imageRef2)
+                            .into(imgWifi)
+
+                }
                 /* heart.setOnClickListener(v -> {
                     DelFavourite(idloc);
 
@@ -140,7 +154,7 @@ class MapsFragment : Fragment() ,
         root.isScrollContainer = false
 
         val actionBar = (activity as AppCompatActivity).supportActionBar
-        actionBar!!.title = "Wifi Location"
+        actionBar!!.title = "Maps"
 
         mMapView = root.findViewById(R.id.mapfav)
         mMapView.onCreate(savedInstanceState)
@@ -225,7 +239,7 @@ class MapsFragment : Fragment() ,
         } else {
             val intent = Intent(activity!!, DisResActivity().javaClass)
 
-            var res: Model.ResultRestaurant?=null
+
 
             restaurants!!.forEach {t ->
                 if (t.lat==marker.position.latitude.toString() && t.lng==marker.position.longitude.toString())
@@ -246,8 +260,8 @@ class MapsFragment : Fragment() ,
 
         restaurants!!.forEach{ r ->
             googleMap!!.addMarker(MarkerOptions().position(LatLng(r.lat.toDouble(),r.lng.toDouble() ))
-                .title(r.name)
-                .snippet(r.description))
+                .title(r.name+"/"+restaurants!!.indexOf(r))
+                .snippet(r.phone))
         }
     }
     override fun onMapReady(mMap: GoogleMap) {
@@ -292,34 +306,7 @@ class MapsFragment : Fragment() ,
 
     }
 
-    private fun getDeviceLocation() {
-        Log.d(TAG, "getDeviceLocation: getting the devices current location")
 
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity!!)
-
-        try {
-            if (mLocationPermissionsGranted!!) {
-
-                val location = this.mFusedLocationProviderClient!!.lastLocation
-                location.addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                       // Log.d(TAG, "onComplete: found location!")
-                        currentLocation = task.result!!
-
-                        /* moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                        DEFAULT_ZOOM);*/
-
-                    } else {
-                        Log.d(TAG, "onComplete: current location is null")
-                        Toast.makeText(context, "unable to get current location", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        } catch (e: SecurityException) {
-            Log.e(TAG, "getDeviceLocation: SecurityException: " + e.message)
-        }
-
-    }
 
     override fun onMarkerClick(marker: Marker): Boolean {
         val handler = Handler()
@@ -383,46 +370,8 @@ class MapsFragment : Fragment() ,
     }
 
 
-    private fun requestDirection() {
-        //Snackbar.make(btnRequestDirection, "Direction Requesting...", Snackbar.LENGTH_SHORT).show();
-        GoogleDirection.withServerKey(serverKey)
-                .from(origin)
-                .to(destination)
-                .transportMode(TransportMode.DRIVING)
-                .execute(this)
-    }
 
-    override fun onDirectionSuccess(direction: Direction, rawBody: String) {
-        //Snackbar.make(btnRequestDirection, "Success with status : " + direction.getStatus(), Snackbar.LENGTH_SHORT).show();
-        Toast.makeText(context, "Searching for directions", Toast.LENGTH_SHORT).show()
 
-        if (direction.isOK) {
-            val route = direction.routeList[0]
-            /*googleMap.addMarker(new MarkerOptions().position(origin));
-            googleMap.addMarker(new MarkerOptions().position(destination));*/
-
-            val directionPositionList = route.legList[0].directionPoint
-            googleMap!!.addPolyline(DirectionConverter.createPolyline(activity!!, directionPositionList, 5, Color.RED))
-            setCameraWithCoordinationBounds(route)
-
-            //btnRequestDirection.setVisibility(View.GONE);
-        } else {
-            // Snackbar.make(btnRequestDirection, direction.getStatus(), Snackbar.LENGTH_SHORT).show();
-            Toast.makeText(context, "No directions found!", Toast.LENGTH_SHORT).show()
-
-        }
-    }
-
-    override fun onDirectionFailure(t: Throwable) {
-        //Snackbar.make(btnRequestDirection, t.getMessage(), Snackbar.LENGTH_SHORT).show();
-    }
-
-    private fun setCameraWithCoordinationBounds(route: Route) {
-        val southwest = route.bound.southwestCoordination.coordination
-        val northeast = route.bound.northeastCoordination.coordination
-        val bounds = LatLngBounds(southwest, northeast)
-        googleMap!!.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-    }
 
     private fun askForLocationPermissions() {
 

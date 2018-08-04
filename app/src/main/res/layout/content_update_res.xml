@@ -11,42 +11,24 @@
 
     <ImageView
         android:id="@+id/Uplocimage_d"
-        android:layout_width="244dp"
-        android:layout_height="97dp"
+        android:layout_width="388dp"
+        android:layout_height="181dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:src="@drawable/ic_add_a_photo_black_24dp"
-        app:layout_constraintBottom_toTopOf="@+id/addname"
+        app:layout_constraintBottom_toTopOf="@+id/Upname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/restaurantimg" />
 
     <EditText
-        android:id="@+id/Uptlf"
-        android:layout_width="212dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:gravity="center_vertical|center"
-        android:hint="Phone"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/UpDesc"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addname"
-        tools:fontFamily="casual" />
-
-    <EditText
         android:id="@+id/Upname"
         android:layout_width="212dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:gravity="center_vertical|center"
         android:hint="Name"
         android:textSize="14sp"
@@ -57,64 +39,84 @@
         app:layout_constraintTop_toBottomOf="@+id/Uplocimage_d"
         tools:fontFamily="casual" />
 
+    <EditText
+        android:id="@+id/Uptlf"
+        android:layout_width="212dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical|center"
+        android:hint="Phone"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/UpDesc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Upname"
+        tools:fontFamily="casual" />
+
     <MultiAutoCompleteTextView
         android:id="@+id/UpDesc"
         android:layout_width="242dp"
         android:layout_height="60dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="71dp"
+        android:layout_marginStart="71dp"
+        android:layout_marginTop="4dp"
         android:ems="10"
         android:fontFamily="monospace"
         android:hint="Description..."
         android:inputType="textPersonName"
+        android:maxLines="2"
+        android:textAlignment="center"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/Uploc"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addtlf"
-        tools:ignore="MissingConstraints"
-        android:maxLines="2"/>
-
-
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/Uploc"
-        android:layout_width="396dp"
-        android:layout_height="200dp"
-
-        android:layout_marginBottom="8dp"
-        android:paddingTop="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/UpSave"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addDesc" />
+        app:layout_constraintTop_toBottomOf="@+id/Uptlf"
+        tools:ignore="MissingConstraints" />
 
-    <Button
-        android:id="@+id/UpSave"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="88dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginTop="8dp"
-        android:paddingBottom="0dp"
-        android:text="Update"
-        android:textColor="@android:color/background_dark"
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:gravity="bottom"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addloc" />
-
-    <Button
-        android:id="@+id/UpCancel"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="88dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="8dp"
-        android:paddingBottom="0dp"
-        android:text="Cancel"
-        android:textColor="@android:color/background_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addloc" />
+        app:layout_constraintTop_toBottomOf="@+id/UpDesc">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/Uploc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:paddingTop="0dp"
+                app:layout_constraintBottom_toTopOf="@+id/addSave"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </FrameLayout>
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/UpSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="11dp"
+            android:gravity="bottom|center"
+            app:backgroundTint="@android:color/holo_red_dark"
+            app:srcCompat="@drawable/update"
+            tools:layout_editor_absoluteX="172dp"
+            tools:layout_editor_absoluteY="478dp" />
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

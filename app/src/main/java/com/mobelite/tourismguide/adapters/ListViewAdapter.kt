@@ -13,16 +13,19 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.daimajia.androidanimations.library.Techniques
 import com.daimajia.androidanimations.library.YoYo
 import com.daimajia.swipe.SimpleSwipeListener
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.BaseSwipeAdapter
+import com.firebase.ui.storage.images.FirebaseImageLoader
+import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import com.mobelite.tourismguide.DisResActivity
 import com.mobelite.tourismguide.R
-import com.mobelite.tourismguide.data.Model
-import com.mobelite.tourismguide.data.RestaurantServices
+import com.mobelite.tourismguide.data.webservice.Model
+import com.mobelite.tourismguide.data.webservice.RestaurantServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -85,10 +88,21 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
         // Populate the data into the template view using the data object
         tvdesc.text = p.name
         //tvHome.setImageResource(p.imageressource);
-        tvpw.text = p.description
+        tvpw.text = p.phone
 //        Picasso.with(mContext)
 //                .load(p.getImg())
 //                .into(tvHome)
+
+        if (p.image!="no image") {
+            val storage  = FirebaseStorage.getInstance()
+            val storageRef = storage.reference
+            val imageRef2 = storageRef.child(p.image)
+            Glide.with(mContext /* context */)
+                    .using(FirebaseImageLoader())
+                    .load(imageRef2)
+                    .into(tvHome)
+
+        }
     }
 
     override fun getItem(position: Int): Any? {

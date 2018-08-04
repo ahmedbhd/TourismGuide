@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Tourism Guide</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Maps</string>
     <string name="title_notifications">Favourites</string>
@@ -10,7 +10,7 @@
     <string name="google_maps_key">AIzaSyDbkY2fSN15Fgt8pTU6YzgcnUf-Hf5k04A</string>
     <string name="home">Home</string>
     <string name="title_activity_add_res">AddResActivity</string>
-    <string name="title_activity_update_res">UpdateResActivity</string>
+
     <string name="title_activity_dis_res">DisResActivity</string>
     <string name="phone">Phone</string>
     <string name="name">Name</string>
@@ -19,5 +19,9 @@
     <string name="todo">TODO</string>
     <string name="description">Description...</string>
     <string name="title_activity_login">LoginActivity</string>
-
+    <string name="facebook_app_id">932267753612702</string>
+    <string name="fb_login_protocol_scheme">fb932267753612702</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="add_restaurant">Add Restaurant</string>
+    <string name="detail">Detail</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.mobelite.tourismguide
 
 import android.Manifest
+import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
@@ -11,6 +13,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import android.view.animation.BounceInterpolator
 import android.widget.Toast
 import com.akexorcist.googledirection.DirectionCallback
@@ -19,6 +22,8 @@ import com.akexorcist.googledirection.constant.TransportMode
 import com.akexorcist.googledirection.model.Direction
 import com.akexorcist.googledirection.model.Route
 import com.akexorcist.googledirection.util.DirectionConverter
+import com.bumptech.glide.Glide
+import com.firebase.ui.storage.images.FirebaseImageLoader
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -26,15 +31,19 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
-import com.mobelite.tourismguide.data.Model
-import com.mobelite.tourismguide.data.RestaurantServices
+import com.mobelite.tourismguide.R.id.*
+import com.mobelite.tourismguide.data.webservice.Model
+import com.mobelite.tourismguide.data.webservice.RestaurantServices
+import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-
-import kotlinx.android.synthetic.main.activity_dis_res.*
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.content_dis_res.*
+
 
 class DisResActivity : AppCompatActivity(),
         OnMapReadyCallback,
@@ -51,7 +60,7 @@ class DisResActivity : AppCompatActivity(),
 
 
     }
-    var r:Model.ResultRestaurant? = null
+    var r: Model.ResultRestaurant? = null
     private var origin : LatLng? = null
     private var destination :LatLng? = null
     private var mLocationPermissionsGranted: Boolean? = false
@@ -59,7 +68,8 @@ class DisResActivity : AppCompatActivity(),
     private var currentLocation: Location? = null
     private lateinit var mMapView: MapView
     private var googleMap: GoogleMap? = null
-
+    private var storage: FirebaseStorage?=null
+    private var storageRef: StorageReference?=null
 
 
     private val restaurantServices by lazy {
@@ -68,8 +78,10 @@ class DisResActivity : AppCompatActivity(),
     private var disposable: Disposable? = null
 
     private fun addFavourite() {
+        val prefs = getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
+        val iduser = prefs.getString("fb_id", null)
         disposable =
-                restaurantServices.insertfav(Model.FavRestaurant(0,r!!.id,"11111"))
+                restaurantServices.insertfav(Model.FavRestaurant(0,r!!.id,iduser))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -80,12 +92,14 @@ class DisResActivity : AppCompatActivity(),
                                         if(result=="ok"){
                                             println("done")
                                             Toast.makeText(this, "Your favourite has been added", Toast.LENGTH_SHORT).show()
-                                            finish()
+
                                         }
                                     }
                                 },
                                 { error ->println( error.message) }
                         )
+        val intent = Intent(this, MainActivity().javaClass)
+        startActivity(intent)
     }
 
 
@@ -93,6 +107,17 @@ class DisResActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dis_res)
         setSupportActionBar(toolbar)
+
+
+
+        if (supportActionBar!=null){
+            supportActionBar!!.setDisplayShowTitleEnabled(false)
+
+            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+            supportActionBar!!.setDisplayShowHomeEnabled(true)
+        }
+
+
 
         val ss:String = intent.getStringExtra("myObject")
         r = Gson().fromJson(ss, Model.ResultRestaurant::class.java)
@@ -102,9 +127,8 @@ class DisResActivity : AppCompatActivity(),
         mMapView.onCreate(savedInstanceState)
         getLocationPermission()
 
-        disCancel.setOnClickListener {
-            finish()
-        }
+
+
 
         distlf.text = r!!.phone
 
@@ -112,10 +136,20 @@ class DisResActivity : AppCompatActivity(),
 
         disDesc.text = r!!.description
 
-        disfav.setOnClickListener {
-            addFavourite()
+        if (r!!.image!="no image") {
+            storage = FirebaseStorage.getInstance()
+            storageRef = storage!!.reference
+            val imageRef2 = storageRef!!.child(r!!.image)
+            Glide.with(this /* context */)
+                    .using(FirebaseImageLoader())
+                    .load(imageRef2)
+                    .into(dislocimage_d)
+
         }
 
+        disfav.setOnClickListener {
+            addFavourite()
+            }
 
     }
 
@@ -235,7 +269,7 @@ class DisResActivity : AppCompatActivity(),
             //btnRequestDirection.setVisibility(View.GONE);
         } else {
             // Snackbar.make(btnRequestDirection, direction.getStatus(), Snackbar.LENGTH_SHORT).show();
-            Toast.makeText(this, "No directions found!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No directions found! ", Toast.LENGTH_SHORT).show()
 
         }
     }
@@ -361,6 +395,14 @@ class DisResActivity : AppCompatActivity(),
             // result of the request.
         }
     }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item!!.itemId==android.R.id.home)
+            finish()
+        return super.onOptionsItemSelected(item)
+    }
+
 
     override fun onResume() {
         mMapView.onResume()

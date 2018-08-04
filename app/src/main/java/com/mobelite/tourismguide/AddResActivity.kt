@@ -1,21 +1,35 @@
 package com.mobelite.tourismguide
 
 import android.Manifest
+import android.app.Activity
+import android.app.PendingIntent.getActivity
+import android.app.ProgressDialog
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.support.annotation.NonNull
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.widget.Toast
+import android.view.MenuItem
+import android.view.View
+import android.widget.*
 import com.akexorcist.googledirection.GoogleDirection
 import com.akexorcist.googledirection.constant.TransportMode
 import com.akexorcist.googledirection.model.Direction
 import com.akexorcist.googledirection.model.Route
 import com.akexorcist.googledirection.util.DirectionConverter
+import com.bumptech.glide.Glide
+import com.firebase.ui.storage.images.FirebaseImageLoader
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -24,13 +38,43 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
-
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.FirebaseApp
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
+import com.mobelite.tourismguide.R.id.addname
+import com.mobelite.tourismguide.data.webservice.Model
+import com.mobelite.tourismguide.data.webservice.RestaurantServices
+import com.squareup.picasso.Picasso
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_add_res.*
 import kotlinx.android.synthetic.main.content_add_res.*
+import java.io.IOException
+import java.util.*
+
 
 class AddResActivity : AppCompatActivity() ,
         OnMapReadyCallback,
         GoogleMap.OnMarkerDragListener {
+
+
+
+    private val restaurantServices by lazy {
+        RestaurantServices.create()
+    }
+    private var disposable: Disposable? = null
+
+
+    var name : EditText? = null
+    var tlf : EditText? = null
+    var des : EditText? = null
+    var imgView : ImageView? = null
+    private val REQUEST_RUNTIME_PERMISSION = 123
+
 
     override fun onMarkerDragEnd(p0: Marker?) {
 
@@ -62,20 +106,83 @@ class AddResActivity : AppCompatActivity() ,
 
     private lateinit var mMapView: MapView
     private var googleMap: GoogleMap? = null
+    private var filePath: Uri?=null
+    internal var storage: FirebaseStorage?=null
+    internal var storageRef: StorageReference?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_res)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        FirebaseApp.initializeApp(this)
+
+        if (supportActionBar!=null){
+            supportActionBar!!.setDisplayShowTitleEnabled(false)
+
+            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+            supportActionBar!!.setDisplayShowHomeEnabled(true)
+        }
+
+
+        storage = FirebaseStorage.getInstance()
+        storageRef = storage!!.reference
+
+        name = findViewById(R.id.addname)
+        des = findViewById(R.id.addDesc)
+        tlf = findViewById(R.id.addtlf)
+        imgView = findViewById(R.id.addLocImage)
+        imgView!!.setOnClickListener {
+            if (CheckPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // you have permission go ahead
+                showFileChooser()
+            } else {
+                // you do not have permission go request runtime permissions
+                RequestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_RUNTIME_PERMISSION);
+            }
+
+        }
+
+
         mMapView = findViewById(R.id.addloc)
         mMapView.onCreate(savedInstanceState)
         getLocationPermission()
 
-        addCancel.setOnClickListener {
-            finish()
-        }
-    }
 
+
+
+        addSave.setOnClickListener {
+            if (filePath==null)
+                addRestaurant("no image")
+            else
+                uploadFile()
+
+        }
+
+    }
+    private fun addRestaurant(image:String) {
+        val prefs = getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
+        val iduser = prefs.getString("fb_id", null)
+        disposable =
+                restaurantServices.insert(Model.ResultRestaurant(0,name!!.text.toString(), tlf!!.text.toString() , des!!.text.toString(),
+                                                "35.623655","10.763919",image,iduser))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { result ->
+                                    run {
+
+                                        if(result=="ok"){
+
+                                            Toast.makeText(this, "The Restaurant has been ADDED", Toast.LENGTH_SHORT).show()
+
+                                        }
+                                    }
+                                },
+                                { error ->println( error.message) }
+                        )
+        val intent = Intent(this, MainActivity().javaClass)
+        startActivity(intent)
+    }
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -206,47 +313,99 @@ class AddResActivity : AppCompatActivity() ,
 
 
 
+    private val PICK_IAMGE_REQUEST = 1234
 
+    private fun showFileChooser(){
+        val intent = Intent()
+        intent.type="image/*"
+        intent.action=Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent,"SELECT PICTURE"),PICK_IAMGE_REQUEST)
+    }
 
-
-
-
-    private fun askForLocationPermissions() {
-
-        // Should we show an explanation?
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-            android.support.v7.app.AlertDialog.Builder(this)
-                    .setTitle("Location permessions needed")
-                    .setMessage("you need to allow this permission!")
-                    .setPositiveButton("Sure") { dialog, which ->
-                        ActivityCompat.requestPermissions(this,
-                                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                               LOCATION_PERMISSION_REQUEST_CODE)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IAMGE_REQUEST &&
+                resultCode == Activity.RESULT_OK &&
+                data != null  && data.data != null)
+        {
+            filePath = data.data
+            try {
+                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver , filePath)
+                imgView!!.setImageBitmap(bitmap)
+            }catch (e:IOException){
+                e.printStackTrace()
+            }
+        }
+    }
+    private fun uploadFile(){
+        if (filePath != null){
+            val progressDialog = ProgressDialog(this)
+            progressDialog.setTitle("Loading ....")
+            progressDialog.show()
+            val imagepath = "images/"+UUID.randomUUID().toString()
+            val imageRef = storageRef!!.child(imagepath)
+            imageRef.putFile(filePath!!)
+                    .addOnSuccessListener { s ->
+                        progressDialog.dismiss()
+                        println("storageRef :$storageRef \nfilePath :$filePath \nimageRef :$imageRef")
+//                        Toast.makeText(this, "File uploaded", Toast.LENGTH_SHORT).show()
+                        addRestaurant(imagepath)
                     }
-                    .setNegativeButton("Not now") { dialog, which ->
-                        //                                        //Do nothing
+                    .addOnFailureListener{
+                        progressDialog.dismiss()
+                        Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
                     }
-                    .show()
+                    .addOnProgressListener {taskSnapshot ->
+                        val progress = 100.0*taskSnapshot.bytesTransferred/taskSnapshot.totalByteCount
+                        progressDialog.setMessage("Upload "+progress.toInt()+"%...")
+                    }
 
-            // Show an expanation to the user *asynchronously* -- don't block
-            // this thread waiting for the user's response! After the user
-            // sees the explanation, try again to request the permission.
 
-        } else {
-
-            // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    LOCATION_PERMISSION_REQUEST_CODE)
-
-            // MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION is an
-            // app-defined int constant. The callback method gets the
-            // result of the request.
         }
     }
 
+
+//    override fun onRequestPermissionsResult(permsRequestCode: Int, permissions: Array<String>, @NonNull grantResults: IntArray) {
+//
+//        when (permsRequestCode) {
+//
+//            REQUEST_RUNTIME_PERMISSION -> {
+//                if (grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
+//                    // you have permission go ahead
+//                   // createApplicationFolder()
+//                    Toast.makeText(this, "permission granted", Toast.LENGTH_SHORT).show()
+//
+//                } else {
+//                    // you do not have permission show toast.
+//                }
+//                return
+//            }
+//        }
+//    }
+
+    fun RequestPermission(thisActivity: Activity, Permission: String, Code: Int) {
+        if (ContextCompat.checkSelfPermission(thisActivity,
+                        Permission)!=PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,
+                            Permission)) {
+            } else {
+                ActivityCompat.requestPermissions(thisActivity,
+                        arrayOf(Permission),
+                        Code)
+            }
+        }
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item!!.itemId==android.R.id.home)
+            finish()
+        return super.onOptionsItemSelected(item)
+    }
+    fun CheckPermission(context: Context, Permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(context,
+                Permission)==PackageManager.PERMISSION_GRANTED
+    }
     override fun onResume() {
         mMapView.onResume()
         super.onResume()
@@ -263,4 +422,6 @@ class AddResActivity : AppCompatActivity() ,
         mMapView.onLowMemory()
         super.onLowMemory()
     }
+
+
 }

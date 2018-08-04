@@ -2,6 +2,7 @@ package com.mobelite.tourismguide.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
 import android.util.Log
@@ -12,19 +13,25 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.daimajia.androidanimations.library.Techniques
 import com.daimajia.androidanimations.library.YoYo
 import com.daimajia.swipe.SimpleSwipeListener
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.BaseSwipeAdapter
+import com.firebase.ui.storage.images.FirebaseImageLoader
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
 import com.mobelite.tourismguide.R
+import com.mobelite.tourismguide.R.id.dislocimage_d
 import com.mobelite.tourismguide.UpdateResActivity
-import com.mobelite.tourismguide.data.Model
-import com.mobelite.tourismguide.data.RestaurantServices
+import com.mobelite.tourismguide.data.webservice.Model
+import com.mobelite.tourismguide.data.webservice.RestaurantServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.content_dis_res.*
 
 class HomeListAdapter (private val mContext: Context, private var favourites: MutableList<Model.ResultRestaurant>, private val manager: FragmentActivity?) : BaseSwipeAdapter() {
     override fun getCount(): Int {
@@ -81,16 +88,26 @@ class HomeListAdapter (private val mContext: Context, private var favourites: Mu
 
         val tvdesc = convertView.findViewById(R.id.favdec_s) as TextView
         val tvpw = convertView.findViewById(R.id.favpw_s) as TextView
-
         val tvHome = convertView.findViewById(R.id.favimg_s) as ImageView
 
         // Populate the data into the template view using the data object
         tvdesc.text = p.name
         //tvHome.setImageResource(p.imageressource);
-        tvpw.text = p.description
+        tvpw.text = p.phone
 //        Picasso.with(mContext)
 //                .load(p.getImg())
 //                .into(tvHome)
+
+        if (p.image!="no image") {
+            val storage  = FirebaseStorage.getInstance()
+            val storageRef = storage.reference
+            val imageRef2 = storageRef.child(p.image)
+            Glide.with(mContext /* context */)
+                    .using(FirebaseImageLoader())
+                    .load(imageRef2)
+                    .into(tvHome)
+
+        }
     }
 
     override fun getItem(position: Int): Any? {
@@ -108,8 +125,22 @@ class HomeListAdapter (private val mContext: Context, private var favourites: Mu
     private var disposable: Disposable? = null
 
     private fun delRestaurant(id:Int , position: Int) {
+        if (favourites[position].image!="no image") {
+            val storage = FirebaseStorage.getInstance()
+            val storageRef = storage.reference
+            val imageRef2 = storageRef.child(favourites[position].image)
+            imageRef2.delete()
+                    .addOnSuccessListener { s ->
+
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(mContext, "Delete failed", Toast.LENGTH_SHORT).show()
+                    }
+        }
+        val prefs = mContext.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
+        val iduser = prefs.getString("fb_id", null)
         disposable =
-                restaurantServices.deleterest("12154687856",id.toString())
+                restaurantServices.deleterest(iduser,id.toString())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -120,7 +151,7 @@ class HomeListAdapter (private val mContext: Context, private var favourites: Mu
                                         if(result=="ok"){
 
                                             Toast.makeText(mContext, "The restaurant has been deleted", Toast.LENGTH_SHORT).show()
-                                            v!!.refreshDrawableState()
+
                                             favourites.remove(favourites[position])
                                             notifyDataSetChanged()
 
@@ -130,5 +161,7 @@ class HomeListAdapter (private val mContext: Context, private var favourites: Mu
                                 { error ->println( error.message) }
                         )
     }
+
+
 
 }

@@ -1,12 +1,23 @@
 package com.mobelite.tourismguide
 
 import android.Manifest
+import android.app.Activity
+import android.app.ProgressDialog
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.firebase.ui.storage.images.FirebaseImageLoader
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -16,15 +27,21 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
-import com.mobelite.tourismguide.data.Model
-import com.mobelite.tourismguide.data.RestaurantServices
+import com.mobelite.tourismguide.data.webservice.Model
+import com.mobelite.tourismguide.data.webservice.RestaurantServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 import kotlinx.android.synthetic.main.activity_update_res.*
+import kotlinx.android.synthetic.main.content_dis_res.*
 import kotlinx.android.synthetic.main.content_update_res.*
+import kotlinx.android.synthetic.main.content_update_res.view.*
+import java.io.IOException
+import java.util.*
 
 class UpdateResActivity : AppCompatActivity(),
         OnMapReadyCallback {
@@ -36,26 +53,28 @@ class UpdateResActivity : AppCompatActivity(),
         private const val FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
         private const val COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION
     }
+    private val REQUEST_RUNTIME_PERMISSION = 123
 
     private var origin = LatLng(35.771261, 10.834128)
 
     private var mLocationPermissionsGranted: Boolean? = false
 
-    var r:Model.ResultRestaurant? = null
+    var r: Model.ResultRestaurant? = null
 
     private lateinit var mMapView: MapView
     private var googleMap: GoogleMap? = null
 
-
+    private var storage: FirebaseStorage?=null
+    private var storageRef: StorageReference?=null
 
     private val restaurantServices by lazy {
         RestaurantServices.create()
     }
     private var disposable: Disposable? = null
 
-    private fun updateRestaurant(m:Model.ResultRestaurant) {
+    private fun updateRestaurant( ) {
         disposable =
-                restaurantServices.updaterest(m)
+                restaurantServices.updaterest(re!!)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -64,21 +83,34 @@ class UpdateResActivity : AppCompatActivity(),
 
                                         println(result)
                                         if(result=="ok"){
-                                            println("done")
+
                                             Toast.makeText(this, "Your Restaurant has been added", Toast.LENGTH_SHORT).show()
-                                            finish()
+
                                         }
                                     }
                                 },
                                 { error ->println( error.message) }
                         )
+        val intent = Intent(this, MainActivity().javaClass)
+        startActivity(intent)
     }
 
-
+    var re :Model.ResultRestaurant?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_update_res)
         setSupportActionBar(toolbar)
+
+
+
+        if (supportActionBar!=null){
+            supportActionBar!!.setDisplayShowTitleEnabled(false)
+
+            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+            supportActionBar!!.setDisplayShowHomeEnabled(true)
+        }
+
+
 
         val ss:String = intent.getStringExtra("myObject")
         r = Gson().fromJson(ss, Model.ResultRestaurant::class.java)
@@ -93,18 +125,102 @@ class UpdateResActivity : AppCompatActivity(),
         Upname.setText (r!!.name)
 
         UpDesc.setText (r!!.description)
-        UpSave.setOnClickListener{
-            val re = Model.ResultRestaurant(r!!.id,Upname.text.toString(), Uptlf.text.toString(),UpDesc.text.toString(),origin.latitude.toString(), origin.longitude.toString(),"no image","12154687856")
 
-            println(re)
-            updateRestaurant(re)
+        if (r!!.image!="no image") {
+            storage = FirebaseStorage.getInstance()
+            storageRef = storage!!.reference
+            val imageRef2 = storageRef!!.child(r!!.image)
+            Glide.with(this /* context */)
+                    .using(FirebaseImageLoader())
+                    .load(imageRef2)
+                    .into(Uplocimage_d)
         }
-        UpCancel.setOnClickListener {
-            finish()
+
+        Uplocimage_d.setOnClickListener {
+            if (CheckPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // you have permission go ahead
+                showFileChooser()
+            } else {
+                // you do not have permission go request runtime permissions
+                RequestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_RUNTIME_PERMISSION);
+            }
+
+        }
+
+        UpSave.setOnClickListener{
+            val prefs = getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
+            val iduser = prefs.getString("fb_id", null)
+            re = Model.ResultRestaurant(r!!.id,Upname.text.toString(), Uptlf.text.toString(),UpDesc.text.toString(),origin.latitude.toString(), origin.longitude.toString(),r!!.image,iduser)
+            if (filePath!=null){
+                uploadFile()
+            }else
+                updateRestaurant()
+
+        }
+
+    }
+    private var filePath: Uri?=null
+
+    private fun showFileChooser(){
+        val intent = Intent()
+        intent.type="image/*"
+        intent.action= Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent,"SELECT PICTURE"),PICK_IAMGE_REQUEST)
+    }
+    private val PICK_IAMGE_REQUEST = 1234
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IAMGE_REQUEST &&
+                resultCode == Activity.RESULT_OK &&
+                data != null  && data.data != null)
+        {
+            filePath = data.data
+            try {
+                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver , filePath)
+                Uplocimage_d!!.setImageBitmap(bitmap)
+            }catch (e: IOException){
+                e.printStackTrace()
+            }
         }
     }
+    private fun uploadFile(){
+        storage = FirebaseStorage.getInstance()
+        storageRef = storage!!.reference
+        if (re!!.image!="no image") {
 
+            val imageRef2 = storageRef!!.child(re!!.image)
+            imageRef2.delete()
+                    .addOnSuccessListener { s ->
 
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Delete failed", Toast.LENGTH_SHORT).show()
+                    }
+            }
+
+            val progressDialog = ProgressDialog(this)
+            progressDialog.setTitle("Loading ....")
+            progressDialog.show()
+            val imagepath = "images/"+ UUID.randomUUID().toString()
+            val imageRef = storageRef!!.child(imagepath)
+            imageRef.putFile(filePath!!)
+                    .addOnSuccessListener { s ->
+                        progressDialog.dismiss()
+//
+                        re!!.image = imagepath
+                        updateRestaurant()
+                    }
+                    .addOnFailureListener{
+                        progressDialog.dismiss()
+                        Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnProgressListener {taskSnapshot ->
+                        val progress = 100.0*taskSnapshot.bytesTransferred/taskSnapshot.totalByteCount
+                        progressDialog.setMessage("Upload "+progress.toInt()+"%...")
+                    }
+
+    }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
 
         fun isPermissionGranted(grantPermissions: Array<String>, grantResults: IntArray,
@@ -178,7 +294,30 @@ class UpdateResActivity : AppCompatActivity(),
 
 
 
+    fun RequestPermission(thisActivity: Activity, Permission: String, Code: Int) {
+        if (ContextCompat.checkSelfPermission(thisActivity,
+                        Permission)!=PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,
+                            Permission)) {
+            } else {
+                ActivityCompat.requestPermissions(thisActivity,
+                        arrayOf(Permission),
+                        Code)
+            }
+        }
+    }
+    fun CheckPermission(context: Context, Permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(context,
+                Permission)==PackageManager.PERMISSION_GRANTED
+    }
 
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item!!.itemId==android.R.id.home)
+            finish()
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun onResume() {
         mMapView.onResume()

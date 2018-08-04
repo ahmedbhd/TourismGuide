@@ -1,8 +1,14 @@
 apply plugin: 'com.android.application'
 
-apply plugin: 'kotlin-android'
 
+apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'kotlin-kapt'
+
+apply plugin: 'kotlin-platform-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+
 
 android {
     compileSdkVersion 27
@@ -19,6 +25,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
     }
 }
 
@@ -49,13 +56,37 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:2.3.0"
     implementation "com.squareup.retrofit2:adapter-rxjava2:2.3.0"
     implementation "com.squareup.retrofit2:converter-gson:2.3.0"
-    implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
+    implementation "io.reactivex.rxjava2:rxandroid:2.0.2"
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.3.0'
+
+
+    implementation "android.arch.persistence.room:runtime:1.1.1"
+    implementation "android.arch.persistence.room:rxjava2:1.1.1"
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
+    kapt "android.arch.persistence.room:compiler:1.1.1"
+
+    implementation "io.reactivex.rxjava2:rxkotlin:2.1.0"
+    implementation "io.reactivex.rxjava2:rxjava:2.1.16"
+
+
+    implementation 'com.facebook.android:facebook-android-sdk:4.30.0'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-auth:16.0.2'
+    implementation 'com.firebaseui:firebase-ui-storage:0.6.0'
+
+
+    implementation 'com.google.firebase:firebase-storage:16.0.1'
 
 
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
+kapt {
+    generateStubs = true
+    mapDiagnosticLocations = true
+    correctErrorTypes = true
 }

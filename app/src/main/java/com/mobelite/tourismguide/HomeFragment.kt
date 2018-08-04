@@ -2,8 +2,10 @@ package com.mobelite.tourismguide.adapters
 
 
 import android.annotation.SuppressLint
+import android.content.ContextWrapper
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +16,8 @@ import android.widget.ListView
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.util.Attributes
 import com.mobelite.tourismguide.R
-import com.mobelite.tourismguide.data.Model
-import com.mobelite.tourismguide.data.RestaurantServices
+import com.mobelite.tourismguide.data.webservice.Model
+import com.mobelite.tourismguide.data.webservice.RestaurantServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -40,8 +42,10 @@ class HomeFragment : Fragment() {
     private var disposable: Disposable? = null
 
     private fun selectMy() {
+        val prefs = activity!!.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
+        val iduser = prefs.getString("fb_id", null)
         disposable =
-                restaurantServices.selectmy("12154687856")
+                restaurantServices.selectmy(iduser)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -61,6 +65,10 @@ class HomeFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_home, container, false)
+        val actionBar = (activity as AppCompatActivity).supportActionBar
+        actionBar!!.title = "Home"
+
+
         list = root.findViewById(R.id.listhome) as ListView
         //val list =listhome as ListView
         selectMy()
