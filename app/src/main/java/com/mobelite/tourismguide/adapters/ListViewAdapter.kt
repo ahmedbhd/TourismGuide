@@ -2,6 +2,7 @@ package com.mobelite.tourismguide.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
 
@@ -58,14 +59,14 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
 
         swipeLayout.setOnDoubleClickListener { _, _ -> Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show() }
         v.findViewById<Button>(R.id.delete).setOnClickListener {
-            Toast.makeText(mContext, "click delete", Toast.LENGTH_SHORT).show()
-            delFav(favourites[position].id,position)
+            // Toast.makeText(mContext, "click delete", Toast.LENGTH_SHORT).show()
+            delFav(favourites[position].id, position)
         }
 
         v.findViewById<Button>(R.id.open).setOnClickListener {
             //Toast.makeText(mContext, "click open", Toast.LENGTH_SHORT).show();
             val intent = Intent(mContext, DisResActivity().javaClass)
-            val res: Model.ResultRestaurant?= favourites[position]
+            val res: Model.ResultRestaurant? = favourites[position]
             println("res ${res.toString()}")
             intent.putExtra("myObject", Gson().toJson(res))
             manager!!.startActivity(intent)
@@ -94,7 +95,7 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
 //                .into(tvHome)
 
         if (p.image!="no image") {
-            val storage  = FirebaseStorage.getInstance()
+            val storage = FirebaseStorage.getInstance()
             val storageRef = storage.reference
             val imageRef2 = storageRef.child(p.image)
             Glide.with(mContext /* context */)
@@ -118,10 +119,11 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
     }
     private var disposable: Disposable? = null
 
-    private fun delFav(id:Int , position: Int) {
-        println ("$id $position")
+    private fun delFav(id: Int, position: Int) {
+        val prefs = mContext.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
+        val iduser = prefs.getString("fb_id", null)
         disposable =
-                restaurantServices.deletefav("11111",id.toString())
+                restaurantServices.deletefav(iduser, id.toString())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -129,7 +131,7 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
                                     run {
 
                                         println(result)
-                                        if(result=="ok"){
+                                        if (result=="ok") {
 
                                             Toast.makeText(mContext, "The restaurant has been deleted", Toast.LENGTH_SHORT).show()
 
@@ -139,7 +141,7 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
                                         }
                                     }
                                 },
-                                { error ->println( error.message) }
+                                { error -> println(error.message) }
                         )
     }
 

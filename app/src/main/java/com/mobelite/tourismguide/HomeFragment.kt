@@ -25,10 +25,10 @@ import io.reactivex.schedulers.Schedulers
 
 class HomeFragment : Fragment() {
 
-    private val names = arrayListOf("Kaushal","Alex","Ram","Abhishek","Narendra Modi")
+    private val names = arrayListOf("Kaushal", "Alex", "Ram", "Abhishek", "Narendra Modi")
     private var mAdapter: HomeListAdapter? = null
     private val mContext = context
-    private var list:ListView?=null
+    private var list: ListView? = null
 
     companion object {
         fun newInstance(): HomeFragment {
@@ -50,12 +50,12 @@ class HomeFragment : Fragment() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 { result ->
-                                    mAdapter = HomeListAdapter(context!!, result as MutableList<Model.ResultRestaurant>,activity)
+                                    mAdapter = HomeListAdapter(context!!, result as MutableList<Model.ResultRestaurant>, activity)
                                     mAdapter!!.mode = Attributes.Mode.Single
                                     println("my $result")
                                     list!!.adapter = mAdapter
                                 },
-                                { error ->println( error.message) }
+                                { error -> println(error.message) }
                         )
     }
 

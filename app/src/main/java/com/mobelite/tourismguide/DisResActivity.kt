@@ -34,10 +34,8 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
-import com.mobelite.tourismguide.R.id.*
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
-import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -197,7 +195,7 @@ class DisResActivity : AppCompatActivity(),
 
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.setOnMarkerClickListener(this)
-        mMap.mapType = GoogleMap.MAP_TYPE_HYBRID //MAP_TYPE_NORMAL, MAP_TYPE_SATELLITE, MAP_TYPE_TERRAIN, MAP_TYPE_HYBRID
+        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL //MAP_TYPE_NORMAL, MAP_TYPE_SATELLITE, MAP_TYPE_TERRAIN, MAP_TYPE_HYBRID
         Log.d("mLocation", mLocationPermissionsGranted.toString())
         if (this.mLocationPermissionsGranted!!) {
 
@@ -246,6 +244,7 @@ class DisResActivity : AppCompatActivity(),
 
     private fun requestDirection() {
         //Snackbar.make(btnRequestDirection, "Direction Requesting...", Snackbar.LENGTH_SHORT).show();
+        println("origin: $origin  destination: $destination")
         GoogleDirection.withServerKey(serverKey)
                 .from(origin)
                 .to(destination)
@@ -281,6 +280,8 @@ class DisResActivity : AppCompatActivity(),
     }
     override fun onDirectionFailure(t: Throwable) {
         //Snackbar.make(btnRequestDirection, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+        Toast.makeText(this, "Failed to load directions", Toast.LENGTH_SHORT).show()
+
     }
 
 
@@ -315,6 +316,8 @@ class DisResActivity : AppCompatActivity(),
                     }
                 }
             }
+            else
+                askForLocationPermissions()
         } catch (e: SecurityException) {
             Log.e(TAG, "getDeviceLocation: SecurityException: " + e.message)
         }

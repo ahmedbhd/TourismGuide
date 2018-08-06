@@ -1,10 +1,9 @@
 package com.mobelite.tourismguide.data.roomservice.database
 
-import android.arch.lifecycle.LiveData
 import com.mobelite.tourismguide.data.roomservice.model.Restaurant
 import io.reactivex.Flowable
 
-class RestaurantRepository (private val mLocationDataSource: IRestaurantDataSource): IRestaurantDataSource {
+class RestaurantRepository(private val mLocationDataSource: IRestaurantDataSource) : IRestaurantDataSource {
     override val allRestaurants: Flowable<List<Restaurant>>
         get() = mLocationDataSource.allRestaurants
 
@@ -30,9 +29,9 @@ class RestaurantRepository (private val mLocationDataSource: IRestaurantDataSour
 
 
     companion object {
-        private var mInstance:RestaurantRepository?=null
-        fun getInstance (mLocationDataSource: IRestaurantDataSource):RestaurantRepository {
-            if (mInstance == null)
+        private var mInstance: RestaurantRepository? = null
+        fun getInstance(mLocationDataSource: IRestaurantDataSource): RestaurantRepository {
+            if (mInstance==null)
                 mInstance = RestaurantRepository(mLocationDataSource)
             return mInstance!!
         }

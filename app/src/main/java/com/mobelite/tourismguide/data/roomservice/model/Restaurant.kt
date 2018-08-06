@@ -4,7 +4,6 @@ import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
-import com.google.android.gms.common.server.BaseApi.append
 import org.jetbrains.annotations.NotNull
 
 
@@ -12,30 +11,30 @@ import org.jetbrains.annotations.NotNull
 class Restaurant {
 
     @NotNull
-    @PrimaryKey (autoGenerate = true)
-    @ColumnInfo (name = "id")
-    var ID:Int =0
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    var ID: Int = 0
 
     @ColumnInfo(name = "name")
-    var Name:String?=null
+    var Name: String? = null
 
     @ColumnInfo(name = "phone")
-    var Phone :String?=null
+    var Phone: String? = null
 
     @ColumnInfo(name = "description")
-    var Desc :String?=null
+    var Desc: String? = null
 
     @ColumnInfo(name = "lat")
-    var Lat :String?=null
+    var Lat: String? = null
 
     @ColumnInfo(name = "lng")
-    var Lng :String?=null
+    var Lng: String? = null
 
     @ColumnInfo(name = "image")
-    var Image :String?=null
+    var Image: String? = null
 
     @ColumnInfo(name = "userid")
-    var UserID :String?=null
+    var UserID: String? = null
 
 
     constructor()
@@ -51,8 +50,8 @@ class Restaurant {
         this.UserID = UserID
     }
 
-    override fun toString():String {
-        return StringBuilder ("resto :").append("\n").append(ID)
+    override fun toString(): String {
+        return StringBuilder("resto :").append("\n").append(ID)
                 .append("\n")
                 .append(Name)
                 .append("\n")

@@ -1,11 +1,10 @@
 package com.mobelite.tourismguide.data.roomservice.local
 
 import com.mobelite.tourismguide.data.roomservice.database.IRestaurantDataSource
-import com.mobelite.tourismguide.data.roomservice.database.RestaurantRepository
 import com.mobelite.tourismguide.data.roomservice.model.Restaurant
 import io.reactivex.Flowable
 
-class RestaurantDataSource (private val restaurantDAO: RestaurantDAO):IRestaurantDataSource {
+class RestaurantDataSource(private val restaurantDAO: RestaurantDAO) : IRestaurantDataSource {
     override val allRestaurants: Flowable<List<Restaurant>>
         get() = restaurantDAO.allRestaurants
 
@@ -14,11 +13,11 @@ class RestaurantDataSource (private val restaurantDAO: RestaurantDAO):IRestauran
     }
 
     override fun insertRestaurant(vararg restaurant: Restaurant) {
-        restaurantDAO.insertRestaurant( *restaurant)
+        restaurantDAO.insertRestaurant(*restaurant)
     }
 
     override fun updateRestaurant(vararg restaurant: Restaurant) {
-        restaurantDAO.updateRestaurant( * restaurant)
+        restaurantDAO.updateRestaurant(* restaurant)
     }
 
     override fun deleteRestaurant(restaurant: Restaurant) {
@@ -30,9 +29,9 @@ class RestaurantDataSource (private val restaurantDAO: RestaurantDAO):IRestauran
     }
 
     companion object {
-        private var mInstance: RestaurantDataSource?=null
-        fun getInstance (restaurantDAO: RestaurantDAO):RestaurantDataSource {
-            if (mInstance == null)
+        private var mInstance: RestaurantDataSource? = null
+        fun getInstance(restaurantDAO: RestaurantDAO): RestaurantDataSource {
+            if (mInstance==null)
                 mInstance = RestaurantDataSource(restaurantDAO)
             return mInstance!!
         }

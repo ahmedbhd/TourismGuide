@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:background="#fdd000"
+        android:background="#F89802"
         android:gravity="center"
         android:tag="Bottom3"
         android:weightSum="10"
@@ -32,7 +32,7 @@
             android:layout_weight="4"
             android:background="@drawable/white"
             android:text="Check"
-            android:textColor="#fdd000" />
+            android:textColor="#F89802" />
 
         <Button
             android:id="@+id/delete"
@@ -41,7 +41,7 @@
             android:layout_weight="4"
             android:background="@drawable/white"
             android:text="Delete"
-            android:textColor="#fdd000" />
+            android:textColor="#F89802" />
         <ImageView
             android:id="@+id/trash"
             android:layout_width="27dp"
@@ -58,14 +58,18 @@
 
         <ImageView
             android:id="@+id/favimg_s"
-            android:layout_width="192dp"
+            android:layout_width="174dp"
             android:layout_height="95dp"
+            android:scaleType="fitXY"
+
             android:layout_marginBottom="4dp"
+            android:layout_marginEnd="2dp"
             android:layout_marginTop="4dp"
             swipe:layout_constraintBottom_toBottomOf="parent"
+            swipe:layout_constraintEnd_toStartOf="@+id/favdec_s"
             swipe:layout_constraintStart_toStartOf="parent"
             swipe:layout_constraintTop_toTopOf="parent"
-            swipe:srcCompat="@mipmap/ic_launcher" />
+            swipe:srcCompat="@drawable/restaurantimg" />
 
 
         <TextView
@@ -76,7 +80,9 @@
             android:layout_marginBottom="2dp"
             android:layout_marginEnd="2dp"
             android:layout_marginTop="8dp"
-            android:drawablePadding="4dp"
+            android:drawablePadding="2dp"
+            android:drawableStart="@drawable/fork"
+            android:gravity="center"
             android:text="Nom"
             android:textAlignment="center"
             android:textColor="#686868"
@@ -93,14 +99,17 @@
             android:layout_height="40dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="2dp"
-            android:drawablePadding="4dp"
+            android:drawablePadding="2dp"
+            android:drawableStart="@drawable/smartphone"
+
+            android:gravity="center"
             android:text="Nom"
             android:textAlignment="center"
-            android:textColor="#686868"
-            android:textStyle="italic"
+            android:textAppearance="@style/subtitetextstyle"
             swipe:layout_constraintBottom_toBottomOf="parent"
             swipe:layout_constraintEnd_toEndOf="parent"
-            swipe:layout_constraintStart_toEndOf="@+id/favimg_s" />
+            swipe:layout_constraintStart_toEndOf="@+id/favimg_s"
+            swipe:layout_constraintTop_toBottomOf="@+id/favdec_s" />
 
 
     </android.support.constraint.ConstraintLayout>

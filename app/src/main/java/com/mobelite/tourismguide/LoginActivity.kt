@@ -1,20 +1,14 @@
 package com.mobelite.tourismguide
 
+
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Base64
 import android.util.Log
-import android.view.View
-import android.widget.Toast
 import com.facebook.*
-
-
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.content_login.*
 import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
@@ -24,14 +18,11 @@ import com.mobelite.tourismguide.data.webservice.RestaurantServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_login.*
 import org.json.JSONObject
 import java.net.MalformedURLException
 import java.net.URL
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.util.*
-import java.util.Arrays.asList
-
 
 
 @Suppress("DEPRECATION")
@@ -46,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
         RestaurantServices.create()
     }
     private var disposable: Disposable? = null
-
+    var progressDialog :ProgressDialog?=null
 
 
 
@@ -57,7 +48,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         setSupportActionBar(toolbar)
         callbackManager = CallbackManager.Factory.create()
-
+        progressDialog  = ProgressDialog(this)
         FacebookSdk.sdkInitialize(applicationContext)
         AppEventsLogger.activateApp(this)
         loginManager = LoginManager.getInstance()
@@ -74,6 +65,8 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         } else {
 
+
+
             loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
 
@@ -82,6 +75,7 @@ class LoginActivity : AppCompatActivity() {
 
                     val accessToken = loginResult.accessToken.token
                     // save accessToken to SharedPreference
+                    @Suppress("NAME_SHADOWING")
                     val prefs = getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
                     val editor = prefs.edit()
                     editor.putString("fb_access_token", accessToken)
@@ -89,30 +83,34 @@ class LoginActivity : AppCompatActivity() {
                     val request = GraphRequest.newMeRequest(
                             loginResult.accessToken
                     ) { jsonObject, _ ->
-
+                        progressDialog!!.setTitle("Loading ....")
+                        progressDialog!!.show()
 
                         // Getting FB User Data
                         getFacebookData(jsonObject)
 
                         val intent = Intent(this@LoginActivity, MainActivity::class.java)
                         startActivity(intent)
-
+                        //finish()
                     }
 
                     val parameters = Bundle()
                     parameters.putString("fields", "id,first_name,last_name,email,gender")
                     request.parameters = parameters
                     request.executeAsync()
+                    progressDialog!!.dismiss()
 
 
                 }
 
 
                 override fun onCancel() {
+                    progressDialog!!.dismiss()
                     Log.d(TAG, "Login attempt cancelled.")
                 }
 
                 override fun onError(e: FacebookException) {
+                    progressDialog!!.dismiss()
                     e.printStackTrace()
                     Log.d(TAG, "Login attempt failed.")
                     deleteAccessToken()
@@ -175,7 +173,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun deleteAccessToken() {
-        val accessTokenTracker = object : AccessTokenTracker() {
+        object : AccessTokenTracker() {
             override fun onCurrentAccessTokenChanged(
                     oldAccessToken: AccessToken,
                     currentAccessToken: AccessToken?) {

@@ -11,56 +11,76 @@
     android:focusableInTouchMode="true"
     android:gravity="center">
 
-    <ImageView
-        android:id="@+id/clientPic"
-        android:layout_width="159dp"
-        android:layout_height="86dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:src="@drawable/ic_power_settings_new_black_24dp"
-        app:layout_constraintBottom_toBottomOf="@+id/passworWifi"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <ImageView
+            android:id="@+id/clientPic"
+            android:layout_width="339dp"
+            android:layout_height="97dp"
+            android:scaleType="fitXY"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="false"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/restaurantimg"
+            app:layout_constraintBottom_toBottomOf="@+id/passworWifi"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/titleWifi"
-        style="@style/titetextstyle"
-        android:layout_width="174dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        <TextView
+            android:id="@+id/titleWifi"
+            style="@style/titetextstyle"
+            android:layout_width="208dp"
+            android:layout_height="36dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
 
-        android:layout_marginTop="8dp"
-        android:drawablePadding="4dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="Nom"
-        android:textColor="#686868"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.09"
-        app:layout_constraintStart_toEndOf="@+id/clientPic"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginTop="18dp"
+            android:background="#5000"
+            android:drawablePadding="4dp"
+            android:drawableStart="@drawable/forks"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Nom"
+            android:textColor="@android:color/background_light"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.09"
+            app:layout_constraintStart_toEndOf="@+id/clientPic"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/passworWifi"
+            style="@style/subtitetextstyle"
+            android:layout_width="208dp"
+            android:layout_height="36dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
 
-    <TextView
-        android:id="@+id/passworWifi"
-        style="@style/subtitetextstyle"
-        android:layout_width="174dp"
-        android:layout_height="27dp"
-        android:layout_marginEnd="8dp"
+            android:layout_marginTop="64dp"
+            android:background="#5000"
+            android:drawablePadding="4dp"
+            android:drawableStart="@drawable/smartphones"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Nom"
+            android:textColor="@android:color/background_light"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.09"
+            app:layout_constraintStart_toEndOf="@+id/clientPic"
+            app:layout_constraintTop_toBottomOf="@+id/titleWifi" />
 
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:drawablePadding="4dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="Nom"
-        android:textStyle="italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.09"
-        app:layout_constraintStart_toEndOf="@+id/clientPic"
-        app:layout_constraintTop_toBottomOf="@+id/titleWifi" />
+    </RelativeLayout>
 
 
 </android.support.constraint.ConstraintLayout>

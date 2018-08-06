@@ -18,7 +18,7 @@ interface RestaurantServices {
                             RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .addConverterFactory(ScalarsConverterFactory.create())
-                    .baseUrl("http://192.168.1.3:3000/")
+                    .baseUrl("http://172.20.22.118:3000/")
                     .build()
 
             return retrofit.create(RestaurantServices::class.java)
@@ -30,9 +30,8 @@ interface RestaurantServices {
     fun selectfav(@Query("id") id: String): Observable<List<Model.ResultRestaurant>>
 
 
-
     @GET("selectAll")
-        fun selectAll(): Observable<List<Model.ResultRestaurant>>
+    fun selectAll(): Observable<List<Model.ResultRestaurant>>
 
 
     @GET("selectmy")
@@ -41,12 +40,12 @@ interface RestaurantServices {
 
     @DELETE("deletefav")
     fun deletefav(@Query("user") user: String,
-                      @Query("res") res: String): Observable<String>
+                  @Query("res") res: String): Observable<String>
 
 
     @DELETE("deleterest")
     fun deleterest(@Query("user") user: String,
-                  @Query("res") res: String): Observable<String>
+                   @Query("res") res: String): Observable<String>
 
     @POST("insert")
     fun insert(@Body resultRestaurant: Model.ResultRestaurant): Observable<String>

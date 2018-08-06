@@ -2,11 +2,10 @@ package com.mobelite.tourismguide.data.roomservice.model
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
 import com.mobelite.tourismguide.data.roomservice.database.RestaurantRepository
 import io.reactivex.Flowable
 
-class RestaurantViewModel(application: Application ,restaurantRepository: RestaurantRepository) : AndroidViewModel(application) {
+class RestaurantViewModel(application: Application, restaurantRepository: RestaurantRepository) : AndroidViewModel(application) {
 
     private val mRepository: RestaurantRepository = RestaurantRepository(restaurantRepository)
 

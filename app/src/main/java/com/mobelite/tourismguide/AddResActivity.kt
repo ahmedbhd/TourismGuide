@@ -59,7 +59,7 @@ import java.util.*
 
 class AddResActivity : AppCompatActivity() ,
         OnMapReadyCallback,
-        GoogleMap.OnMarkerDragListener {
+        GoogleMap.OnMapClickListener {
 
 
 
@@ -76,18 +76,18 @@ class AddResActivity : AppCompatActivity() ,
     private val REQUEST_RUNTIME_PERMISSION = 123
 
 
-    override fun onMarkerDragEnd(p0: Marker?) {
+//    override fun onMarkerDragEnd(p0: Marker?) {
+//
+//        println(p0!!.position)
+//    }
 
-        println(p0!!.position)
-    }
-
-    override fun onMarkerDragStart(p0: Marker?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onMarkerDrag(p0: Marker?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+//    override fun onMarkerDragStart(p0: Marker?) {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+//
+//    override fun onMarkerDrag(p0: Marker?) {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -164,7 +164,7 @@ class AddResActivity : AppCompatActivity() ,
         val iduser = prefs.getString("fb_id", null)
         disposable =
                 restaurantServices.insert(Model.ResultRestaurant(0,name!!.text.toString(), tlf!!.text.toString() , des!!.text.toString(),
-                                                "35.623655","10.763919",image,iduser))
+                                                origin.latitude.toString(),origin.longitude.toString(),image,iduser))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -225,9 +225,10 @@ class AddResActivity : AppCompatActivity() ,
                 .draggable(false))
 
 
+        mMap.setOnMapClickListener(this)
         mMap.uiSettings.isZoomControlsEnabled = true
-        mMap.setOnMarkerDragListener(this)
-        mMap.mapType = GoogleMap.MAP_TYPE_HYBRID //MAP_TYPE_NORMAL, MAP_TYPE_SATELLITE, MAP_TYPE_TERRAIN, MAP_TYPE_HYBRID
+      //  mMap.setOnMarkerDragListener(this)
+        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL //MAP_TYPE_NORMAL, MAP_TYPE_SATELLITE, MAP_TYPE_TERRAIN, MAP_TYPE_HYBRID
         Log.d("mLocation", mLocationPermissionsGranted.toString())
         if (this.mLocationPermissionsGranted!!) {
             getDeviceLocation()
@@ -249,6 +250,15 @@ class AddResActivity : AppCompatActivity() ,
     }
 
 
+    override fun onMapClick(p0: LatLng?) {
+        googleMap!!.clear()
+        googleMap!!.addMarker(MarkerOptions().position(p0!!)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .draggable(false))
+        origin = p0
+
+    }
+
     private fun getDeviceLocation() {
         Log.d(TAG, "getDeviceLocation: getting the devices current location")
 
@@ -261,7 +271,7 @@ class AddResActivity : AppCompatActivity() ,
                 location.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "onComplete: found location!")
-                        currentLocation = task.result!! as Location
+                        currentLocation = task.result!!
 
                         /* moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
                         DEFAULT_ZOOM);*/
@@ -345,7 +355,7 @@ class AddResActivity : AppCompatActivity() ,
             val imagepath = "images/"+UUID.randomUUID().toString()
             val imageRef = storageRef!!.child(imagepath)
             imageRef.putFile(filePath!!)
-                    .addOnSuccessListener { s ->
+                    .addOnSuccessListener {
                         progressDialog.dismiss()
                         println("storageRef :$storageRef \nfilePath :$filePath \nimageRef :$imageRef")
 //                        Toast.makeText(this, "File uploaded", Toast.LENGTH_SHORT).show()

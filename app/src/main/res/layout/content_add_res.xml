@@ -13,9 +13,11 @@
         android:id="@+id/addLocImage"
         android:layout_width="375dp"
         android:layout_height="176dp"
+        android:scaleType="fitXY"
+
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/ic_add_a_photo_black_24dp"
+        android:src="@drawable/restaurantimg"
         app:layout_constraintBottom_toTopOf="@+id/addname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

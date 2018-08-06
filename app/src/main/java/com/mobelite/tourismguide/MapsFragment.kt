@@ -4,10 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.location.Location
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.support.annotation.RequiresApi
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
@@ -22,21 +24,17 @@ import android.view.animation.BounceInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.akexorcist.googledirection.DirectionCallback
-import com.akexorcist.googledirection.GoogleDirection
-import com.akexorcist.googledirection.constant.TransportMode
-import com.akexorcist.googledirection.model.Direction
-import com.akexorcist.googledirection.model.Route
-import com.akexorcist.googledirection.util.DirectionConverter
 import com.bumptech.glide.Glide
 import com.firebase.ui.storage.images.FirebaseImageLoader
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import com.mobelite.tourismguide.data.webservice.Model
@@ -296,7 +294,7 @@ class MapsFragment : Fragment() ,
 
             mMap.isMyLocationEnabled = true
             mMap.uiSettings.isMyLocationButtonEnabled = true
-            mMap.mapType = GoogleMap.MAP_TYPE_HYBRID //MAP_TYPE_NORMAL, MAP_TYPE_SATELLITE, MAP_TYPE_TERRAIN, MAP_TYPE_HYBRID
+            mMap.mapType = GoogleMap.MAP_TYPE_NORMAL //MAP_TYPE_NORMAL, MAP_TYPE_SATELLITE, MAP_TYPE_TERRAIN, MAP_TYPE_HYBRID
             //getDeviceLocation()
         }
 
@@ -387,7 +385,7 @@ class MapsFragment : Fragment() ,
                                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                                 LOCATION_PERMISSION_REQUEST_CODE)
                     }
-                    .setNegativeButton("Not now") { dialog, which ->
+                    .setNegativeButton("Not now") { _, _ ->
                         //                                        //Do nothing
                     }
                     .show()

@@ -30,22 +30,20 @@ import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Action
-import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 
 
 class ListFragment : Fragment() {
 
-    private var OfflineData :MutableList<Model.ResultRestaurant> = ArrayList()
+    private var OfflineData: MutableList<Model.ResultRestaurant> = ArrayList()
     private var mAdapter: ListViewAdapter? = null
     private val mContext = context
-    var list:ListView?=null
-    private var isOnline:Boolean = false
+    var list: ListView? = null
+    private var isOnline: Boolean = false
 
     //Room
-    var compositeDisposable:CompositeDisposable?=null
-    var restaurantRepository:RestaurantRepository?=null
+    var compositeDisposable: CompositeDisposable? = null
+    var restaurantRepository: RestaurantRepository? = null
 
     companion object {
         fun newInstance(): ListFragment {
@@ -67,24 +65,25 @@ class ListFragment : Fragment() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 { result ->
-                                    mAdapter = ListViewAdapter(context!!, result as MutableList<Model.ResultRestaurant>,activity)
+                                    mAdapter = ListViewAdapter(context!!, result as MutableList<Model.ResultRestaurant>, activity)
                                     mAdapter!!.mode = Attributes.Mode.Single
                                     list!!.adapter = mAdapter
                                     val restaurantDataBase = RestaurantDataBase.getInstance(activity!!)
                                     restaurantRepository = RestaurantRepository.getInstance(RestaurantDataSource.getInstance(restaurantDataBase.restaurantDAO()))
                                     deleteAllOfflineData()
                                     result.forEach { r ->
-                                        addOfflineRestaurant(Restaurant(r.id,r.name,r.phone,r.description,r.lat,r.lng,r.image,r.userid))
+                                        addOfflineRestaurant(Restaurant(r.id, r.name, r.phone, r.description, r.lat, r.lng, r.image, r.userid))
                                         println("adding to room")
                                     }
 
                                 },
-                                { error ->println( error.message) }
+                                { error -> println(error.message) }
                         )
     }
-    private fun selectFavOffline (){
+
+    private fun selectFavOffline() {
         compositeDisposable = CompositeDisposable()
-        mAdapter = ListViewAdapter(activity!!,OfflineData,activity)
+        mAdapter = ListViewAdapter(activity!!, OfflineData, activity)
         mAdapter!!.mode = Attributes.Mode.Single
         list!!.adapter = mAdapter
         val restaurantDataBase = RestaurantDataBase.getInstance(activity!!)
@@ -108,6 +107,8 @@ class ListFragment : Fragment() {
         if (isNetworkAvailable())
             selectFav()
         else {
+            Toast.makeText(context, "Loading offline", Toast.LENGTH_SHORT).show()
+
             println("loading offline:")
             selectFavOffline()
         }
@@ -153,8 +154,8 @@ class ListFragment : Fragment() {
         val disposable = restaurantRepository!!.allRestaurants
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe({restaurants -> onGetAllRestaurantSuccess(restaurants)}){
-                    throwable -> Toast.makeText (context , ""+throwable.message , Toast.LENGTH_SHORT).show()
+                .subscribe({ restaurants -> onGetAllRestaurantSuccess(restaurants) }) { throwable ->
+                    Toast.makeText(context, "" + throwable.message, Toast.LENGTH_SHORT).show()
                 }
 
         compositeDisposable!!.add(disposable)
@@ -163,27 +164,27 @@ class ListFragment : Fragment() {
 
     private fun onGetAllRestaurantSuccess(restaurants: List<Restaurant>?) {
         OfflineData.clear()
-        val rests: ArrayList< Model.ResultRestaurant> = ArrayList()
-       restaurants!!.forEach { r ->
-               val rest = Model.ResultRestaurant(r.ID, r.Name!!, r.Phone!!, r.Desc!!, r.Lat!!, r.Lng!!, r.Image!!, r.UserID!!)
-               rests.add(rest)
+        val rests: ArrayList<Model.ResultRestaurant> = ArrayList()
+        restaurants!!.forEach { r ->
+            val rest = Model.ResultRestaurant(r.ID, r.Name!!, r.Phone!!, r.Desc!!, r.Lat!!, r.Lng!!, r.Image!!, r.UserID!!)
+            rests.add(rest)
 
-       }
+        }
         OfflineData.addAll(rests)
         println(restaurants.toString())
         mAdapter!!.notifyDataSetChanged()
     }
 
-    private fun deleteAllOfflineData (){
-        val  disposable = Observable.create(ObservableOnSubscribe<Any> { e ->
+    private fun deleteAllOfflineData() {
+        val disposable = Observable.create(ObservableOnSubscribe<Any> { e ->
             restaurantRepository!!.deleteAll()
             e.onComplete()
         })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({ },
-                        {
-                            throwable -> Toast.makeText(context,throwable.message , Toast.LENGTH_SHORT).show()
+                        { throwable ->
+                            Toast.makeText(context, throwable.message, Toast.LENGTH_SHORT).show()
                         },
                         { })
         if (!isOnline)
@@ -199,8 +200,8 @@ class ListFragment : Fragment() {
         return isOnline
     }
 
-    private fun addOfflineRestaurant (restaurant: Restaurant){
-        val  disposable = Observable.create(ObservableOnSubscribe<Any> { e ->
+    private fun addOfflineRestaurant(restaurant: Restaurant) {
+        val disposable = Observable.create(ObservableOnSubscribe<Any> { e ->
             println(restaurant)
             restaurantRepository!!.insertRestaurant(restaurant)
             e.onComplete()
@@ -208,15 +209,14 @@ class ListFragment : Fragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({ },
-                        {
-                            throwable -> Toast.makeText(context,""+throwable.message , Toast.LENGTH_SHORT).show()
+                        { throwable ->
+                            Toast.makeText(context, "" + throwable.message, Toast.LENGTH_SHORT).show()
                         },
                         {
-//                            loadOfflineData()
+                            //                            loadOfflineData()
                         })
         if (!isOnline)
             compositeDisposable!!.addAll(disposable)
-
 
 
     }
