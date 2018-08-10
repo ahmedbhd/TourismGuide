@@ -2,9 +2,7 @@ package com.mobelite.tourismguide
 
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.ContextWrapper
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -25,6 +23,7 @@ import com.mobelite.tourismguide.data.roomservice.local.RestaurantDataSource
 import com.mobelite.tourismguide.data.roomservice.model.Restaurant
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
+import com.mobelite.tourismguide.tools.PhoneGrantings
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -33,21 +32,19 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 
-class ListFragment : Fragment() {
+class FavouriteFragment : Fragment() {
 
     private var OfflineData: MutableList<Model.ResultRestaurant> = ArrayList()
     private var mAdapter: ListViewAdapter? = null
-    private val mContext = context
     var list: ListView? = null
-    private var isOnline: Boolean = false
 
     //Room
     var compositeDisposable: CompositeDisposable? = null
     var restaurantRepository: RestaurantRepository? = null
 
     companion object {
-        fun newInstance(): ListFragment {
-            return ListFragment()
+        fun newInstance(): FavouriteFragment {
+            return FavouriteFragment()
         }
     }
 
@@ -59,6 +56,11 @@ class ListFragment : Fragment() {
     private fun selectFav() {
         val prefs = activity!!.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
         val iduser = prefs.getString("fb_id", null)
+
+        val restaurantDataBase = RestaurantDataBase.getInstance(activity!!)
+        restaurantRepository = RestaurantRepository.getInstance(RestaurantDataSource.getInstance(restaurantDataBase.restaurantDAO()))
+        deleteAllOfflineData()
+
         disposable =
                 restaurantServices.selectfav(iduser)
                         .subscribeOn(Schedulers.io())
@@ -68,9 +70,6 @@ class ListFragment : Fragment() {
                                     mAdapter = ListViewAdapter(context!!, result as MutableList<Model.ResultRestaurant>, activity)
                                     mAdapter!!.mode = Attributes.Mode.Single
                                     list!!.adapter = mAdapter
-                                    val restaurantDataBase = RestaurantDataBase.getInstance(activity!!)
-                                    restaurantRepository = RestaurantRepository.getInstance(RestaurantDataSource.getInstance(restaurantDataBase.restaurantDAO()))
-                                    deleteAllOfflineData()
                                     result.forEach { r ->
                                         addOfflineRestaurant(Restaurant(r.id, r.name, r.phone, r.description, r.lat, r.lng, r.image, r.userid))
                                         println("adding to room")
@@ -104,7 +103,7 @@ class ListFragment : Fragment() {
 
         list = root.findViewById(R.id.flistfav) as ListView
 
-        if (isNetworkAvailable())
+        if (PhoneGrantings.isNetworkAvailable(activity!!))
             selectFav()
         else {
             Toast.makeText(context, "Loading offline", Toast.LENGTH_SHORT).show()
@@ -117,34 +116,36 @@ class ListFragment : Fragment() {
 
 
         list!!.setOnItemClickListener { _, _, position, _ -> (list!!.getChildAt(position - list!!.firstVisiblePosition) as SwipeLayout).open(true) }
-        list!!.setOnTouchListener { _, _ ->
-            Log.e("ListView", "OnTouch")
-            false
-        }
+//        list!!.setOnTouchListener { _, _ ->
+//            Log.e("ListView", "OnTouch")
+//            false
+//        }
+
+
 //        list.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, view, position, id ->
 //            Toast.makeText(mContext, "OnItemLongClickListener", Toast.LENGTH_SHORT).show()
 //
 //            true
 //        }
-        list!!.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
-                Log.e("ListView", "onScrollStateChanged")
-            }
-
-            override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
-
-            }
-        })
-
-        list!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                Log.e("ListView", "onItemSelected:$position")
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Log.e("ListView", "onNothingSelected:")
-            }
-        }
+//        list!!.setOnScrollListener(object : AbsListView.OnScrollListener {
+//            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
+//                Log.e("ListView", "onScrollStateChanged")
+//            }
+//
+//            override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
+//
+//            }
+//        })
+//
+//        list!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+//                Log.e("ListView", "onItemSelected:$position")
+//            }
+//
+//            override fun onNothingSelected(parent: AdapterView<*>) {
+//                Log.e("ListView", "onNothingSelected:")
+//            }
+//        }
 
 
         return root
@@ -187,18 +188,10 @@ class ListFragment : Fragment() {
                             Toast.makeText(context, throwable.message, Toast.LENGTH_SHORT).show()
                         },
                         { })
-        if (!isOnline)
+        if (!PhoneGrantings.isNetworkAvailable(activity!!))
             compositeDisposable!!.addAll(disposable)
     }
 
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetworkInfo = connectivityManager.activeNetworkInfo
-        val test = activeNetworkInfo!=null && activeNetworkInfo.isConnected
-        Log.d("CONNECTION TEST ", java.lang.Boolean.toString(test))
-        isOnline = activeNetworkInfo!=null && activeNetworkInfo.isConnected
-        return isOnline
-    }
 
     private fun addOfflineRestaurant(restaurant: Restaurant) {
         val disposable = Observable.create(ObservableOnSubscribe<Any> { e ->
@@ -215,14 +208,14 @@ class ListFragment : Fragment() {
                         {
                             //                            loadOfflineData()
                         })
-        if (!isOnline)
+        if (!PhoneGrantings.isNetworkAvailable(activity!!))
             compositeDisposable!!.addAll(disposable)
 
 
     }
 
     override fun onDestroy() {
-        if (!isOnline)
+        if (!PhoneGrantings.isNetworkAvailable(activity!!))
             compositeDisposable!!.clear()
         super.onDestroy()
     }

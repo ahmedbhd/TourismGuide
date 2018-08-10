@@ -147,7 +147,7 @@ class HomeListAdapter(private val mContext: Context, private var favourites: Mut
                                         println(result)
                                         if (result=="ok") {
 
-                                            Toast.makeText(mContext, "The restaurant has been deleted", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(mContext, "Delete succeeded", Toast.LENGTH_SHORT).show()
 
                                             favourites.remove(favourites[position])
                                             notifyDataSetChanged()

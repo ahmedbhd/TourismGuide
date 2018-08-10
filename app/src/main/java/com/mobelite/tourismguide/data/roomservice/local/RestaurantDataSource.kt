@@ -16,13 +16,13 @@ class RestaurantDataSource(private val restaurantDAO: RestaurantDAO) : IRestaura
         restaurantDAO.insertRestaurant(*restaurant)
     }
 
-    override fun updateRestaurant(vararg restaurant: Restaurant) {
-        restaurantDAO.updateRestaurant(* restaurant)
-    }
-
-    override fun deleteRestaurant(restaurant: Restaurant) {
-        restaurantDAO.deleteRestaurant(restaurant)
-    }
+//    override fun updateRestaurant(vararg restaurant: Restaurant) {
+//        restaurantDAO.updateRestaurant(* restaurant)
+//    }
+//
+//    override fun deleteRestaurant(restaurant: Restaurant) {
+//        restaurantDAO.deleteRestaurant(restaurant)
+//    }
 
     override fun deleteAll() {
         restaurantDAO.deleteAll()

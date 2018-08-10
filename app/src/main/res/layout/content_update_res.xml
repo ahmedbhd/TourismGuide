@@ -50,6 +50,7 @@
         android:layout_marginTop="4dp"
         android:gravity="center_vertical|center"
         android:hint="Phone"
+        android:inputType="phone"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/UpDesc"
@@ -64,17 +65,16 @@
         android:layout_height="60dp"
         android:layout_marginEnd="71dp"
         android:layout_marginStart="71dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="2dp"
         android:ems="10"
         android:fontFamily="monospace"
         android:hint="Description..."
-        android:inputType="textPersonName"
+        android:inputType="textMultiLine"
         android:maxLines="2"
         android:textAlignment="center"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Uptlf"
         tools:ignore="MissingConstraints" />
@@ -82,10 +82,10 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="4dp"
-        android:gravity="bottom"
+        android:layout_width="291dp"
+        android:layout_height="134dp"
+        android:layout_marginTop="2dp"
+        android:gravity="bottom|center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,17 +94,19 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true">
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/Uploc"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
 
-                android:paddingTop="0dp"
-                app:layout_constraintBottom_toTopOf="@+id/addSave"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+            <ImageView
+                android:id="@+id/imgupdiag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+
+                android:clickable="true"
+                android:longClickable="true"
+                app:srcCompat="@drawable/mapsicon" />
         </FrameLayout>
 
 
@@ -114,7 +116,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="11dp"
+            android:layout_marginBottom="0dp"
             android:gravity="bottom|center"
             app:backgroundTint="@android:color/holo_red_dark"
             app:srcCompat="@drawable/update"

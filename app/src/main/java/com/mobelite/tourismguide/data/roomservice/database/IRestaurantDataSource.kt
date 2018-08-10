@@ -8,7 +8,7 @@ interface IRestaurantDataSource {
     val allRestaurants: Flowable<List<Restaurant>>
     fun getRestaurantById(id: Int): Flowable<Restaurant>
     fun insertRestaurant(vararg restaurant: Restaurant)
-    fun updateRestaurant(vararg restaurant: Restaurant)
-    fun deleteRestaurant(restaurant: Restaurant)
+//    fun updateRestaurant(vararg restaurant: Restaurant)
+//    fun deleteRestaurant(restaurant: Restaurant)
     fun deleteAll()
 }

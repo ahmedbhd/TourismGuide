@@ -17,15 +17,15 @@ interface RestaurantServices {
                     .addCallAdapterFactory(
                             RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .baseUrl("http://172.20.22.118:3000/")
+//                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .baseUrl("http://192.168.1.3:3000/")
                     .build()
 
             return retrofit.create(RestaurantServices::class.java)
         }
     }
 
-
+    //========================= Restaurant WS ====================================
     @GET("selectfav")
     fun selectfav(@Query("id") id: String): Observable<List<Model.ResultRestaurant>>
 
@@ -59,8 +59,28 @@ interface RestaurantServices {
     fun updaterest(@Body resultRestaurant: Model.ResultRestaurant): Observable<String>
 
 
+
+    //==================================== user ws ====================================
     @POST("insertuser")
     fun insertUser(@Body User: Model.User): Observable<String>
 
 
+    //==================================== comments ws ====================================
+    @GET("allCmnts")
+    fun allCmnts(@Query("rest") id: String): Observable<List<Model.Review>>
+
+    @GET("myCmnts")
+    fun myCmnts(@Query("id") user: String , @Query("rest") rest: String): Observable<List<Model.Review>>
+
+    @DELETE("deleteCmnt")
+    fun deleteCmnt(@Query("id") id: String  ): Observable<String>
+
+    @POST("insertCmnt")
+    fun insertCmnt(@Body favRestaurant: Model.Review): Observable<String>
+
+    @PUT("updateCmnt")
+    fun updateCmnt(@Body resultRestaurant: Model.Review): Observable<String>
+
+    @GET("cmntCount/{rest}")
+    fun cmntCount(@Path("rest") id:Int): Observable<String>
 }

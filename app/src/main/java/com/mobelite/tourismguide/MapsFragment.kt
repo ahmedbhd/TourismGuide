@@ -165,7 +165,7 @@ class MapsFragment : Fragment() ,
         val flotadd = root.findViewById(R.id.fabadd) as FloatingActionButton
         flotadd.setOnClickListener {
 
-            val intent = Intent(context, AddResActivity().javaClass)
+            val intent = Intent(context, UpdateResActivity().javaClass)
 
             requireActivity().startActivity(intent)
 

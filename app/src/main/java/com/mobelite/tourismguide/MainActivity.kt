@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {
-                replaceFragment(ListFragment.newInstance(), R.id.page)
+                replaceFragment(FavouriteFragment.newInstance(), R.id.page)
 
                 return@OnNavigationItemSelectedListener true
             }

@@ -16,11 +16,11 @@ interface RestaurantDAO {
     @Insert
     fun insertRestaurant(vararg restaurant: Restaurant)
 
-    @Update
-    fun updateRestaurant(vararg restaurant: Restaurant)
-
-    @Delete
-    fun deleteRestaurant(restaurant: Restaurant)
+//    @Update
+//    fun updateRestaurant(vararg restaurant: Restaurant)
+//
+//    @Delete
+//    fun deleteRestaurant(restaurant: Restaurant)
 
     @Query("DELETE  FROM restaurant")
     fun deleteAll()

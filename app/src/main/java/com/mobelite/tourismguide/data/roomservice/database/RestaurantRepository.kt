@@ -15,13 +15,13 @@ class RestaurantRepository(private val mLocationDataSource: IRestaurantDataSourc
         mLocationDataSource.insertRestaurant(*restaurant)
     }
 
-    override fun updateRestaurant(vararg restaurant: Restaurant) {
-        mLocationDataSource.updateRestaurant(*restaurant)
-    }
-
-    override fun deleteRestaurant(restaurant: Restaurant) {
-        mLocationDataSource.deleteRestaurant(restaurant)
-    }
+//    override fun updateRestaurant(vararg restaurant: Restaurant) {
+//        mLocationDataSource.updateRestaurant(*restaurant)
+//    }
+//
+//    override fun deleteRestaurant(restaurant: Restaurant) {
+//        mLocationDataSource.deleteRestaurant(restaurant)
+//    }
 
     override fun deleteAll() {
         mLocationDataSource.deleteAll()

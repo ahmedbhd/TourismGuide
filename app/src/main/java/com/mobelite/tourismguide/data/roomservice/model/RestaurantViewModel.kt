@@ -9,10 +9,10 @@ class RestaurantViewModel(application: Application, restaurantRepository: Restau
 
     private val mRepository: RestaurantRepository = RestaurantRepository(restaurantRepository)
 
-    private val allWords: Flowable<List<Restaurant>>
+    private val allRes: Flowable<List<Restaurant>>
 
     init {
-        allWords = mRepository.allRestaurants
+        allRes = mRepository.allRestaurants
     }
 
     fun insert(restaurant: Restaurant) {

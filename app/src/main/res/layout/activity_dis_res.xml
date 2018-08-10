@@ -32,5 +32,4 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_dis_res" />
-
 </android.support.design.widget.CoordinatorLayout>

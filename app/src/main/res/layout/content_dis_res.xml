@@ -13,27 +13,59 @@
         android:id="@+id/dislocimage_d"
         android:layout_width="375dp"
         android:layout_height="176dp"
-        android:scaleType="fitXY"
 
         android:contentDescription="@string/todo"
+        android:scaleType="fitXY"
         android:src="@drawable/restaurantimg"
-        app:layout_constraintBottom_toTopOf="@+id/disname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread_inside"
         app:srcCompat="@drawable/restaurantimg" />
+
+    <TextView
+        android:id="@+id/cmntnbr"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="313dp"
+        android:clickable="true"
+        android:text="TextView"
+        android:textColor="@android:color/holo_blue_bright"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dislocimage_d" />
+
+    <TextView
+        android:id="@+id/disname"
+        android:layout_width="215dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical|center"
+        android:hint="@string/name"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/distlf"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cmntnbr"
+        tools:fontFamily="casual" />
 
     <TextView
         android:id="@+id/distlf"
         android:layout_width="212dp"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="2dp"
         android:gravity="center_vertical|center"
         android:hint="@string/phone"
-        android:textSize="14sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/disDesc"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,29 +73,11 @@
         app:layout_constraintTop_toBottomOf="@+id/disname"
         tools:fontFamily="casual" />
 
-    <TextView
-        android:id="@+id/disname"
-        android:layout_width="215dp"
-        android:layout_height="42dp"
-        android:layout_marginBottom="2dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="2dp"
-        android:gravity="center_vertical|center"
-        android:hint="@string/name"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/distlf"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dislocimage_d"
-        tools:fontFamily="casual" />
-
 
     <TextView
         android:id="@+id/disDesc"
         android:layout_width="242dp"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -71,9 +85,10 @@
         android:ems="10"
         android:fontFamily="monospace"
         android:hint="@string/description"
+        android:longClickable="true"
         android:maxLines="2"
         android:textAlignment="center"
-        android:textSize="12sp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,10 +98,10 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="293dp"
+        android:layout_height="134dp"
         android:layout_marginTop="2dp"
-        android:gravity="bottom"
+        android:gravity="bottom|center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,17 +110,18 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true">
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/disloc"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
 
-                android:paddingTop="0dp"
-                app:layout_constraintBottom_toTopOf="@+id/addSave"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+            <ImageView
+                android:id="@+id/imgadisdiag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:clickable="true"
+                android:longClickable="true"
+                app:srcCompat="@drawable/mapsicon" />
         </FrameLayout>
 
 
@@ -115,7 +131,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="11dp"
+            android:layout_marginBottom="0dp"
             android:gravity="bottom|center"
             app:backgroundTint="@android:color/holo_red_dark"
             app:srcCompat="@drawable/heart"
