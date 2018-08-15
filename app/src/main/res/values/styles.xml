@@ -25,4 +25,14 @@
     <style name="subtitetextstyle" parent="TextAppearance.AppCompat.Caption">
 
     </style>
+    <style name="AppThemeRatingBar" parent="Theme.AppCompat">
+        <item name="colorAccent">#6200ea</item>
+        <item name="android:colorControlNormal">#f9a825</item>
+    </style>
+    <style name="MyRatingBar" parent="Base.Widget.AppCompat.RatingBar.Small">
+        <item name="android:progressDrawable">@drawable/custom_ratingbar</item>
+        <item name="colorControlNormal">#f57c00</item>
+        <item name="colorControlActivated">#c51162</item>
+    </style>
+
 </resources>

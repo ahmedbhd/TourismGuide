@@ -4,7 +4,6 @@ import io.reactivex.Observable
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.*
 
 interface RestaurantServices {
@@ -18,7 +17,7 @@ interface RestaurantServices {
                             RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
 //                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .baseUrl("http://192.168.1.3:3000/")
+                    .baseUrl("http://192.168.1.19:3000/")
                     .build()
 
             return retrofit.create(RestaurantServices::class.java)
@@ -58,7 +57,8 @@ interface RestaurantServices {
     @PUT("updaterest")
     fun updaterest(@Body resultRestaurant: Model.ResultRestaurant): Observable<String>
 
-
+    @GET("isfav/{user}/{idres}")
+    fun ifFavourite(@Path("user") user: String, @Path("idres") idres: String): Observable<String>
 
     //==================================== user ws ====================================
     @POST("insertuser")
@@ -70,17 +70,26 @@ interface RestaurantServices {
     fun allCmnts(@Query("rest") id: String): Observable<List<Model.Review>>
 
     @GET("myCmnts")
-    fun myCmnts(@Query("id") user: String , @Query("rest") rest: String): Observable<List<Model.Review>>
+    fun myCmnts(@Query("user") user: String, @Query("rest") rest: String): Observable<List<Model.Review>>
 
     @DELETE("deleteCmnt")
-    fun deleteCmnt(@Query("id") id: String  ): Observable<String>
+    fun deleteCmnt(@Query("id") id: String): Observable<String>
 
     @POST("insertCmnt")
-    fun insertCmnt(@Body favRestaurant: Model.Review): Observable<String>
+    fun insertCmnt(@Body review: Model.Review): Observable<String>
 
     @PUT("updateCmnt")
-    fun updateCmnt(@Body resultRestaurant: Model.Review): Observable<String>
+    fun updateCmnt(@Body review: Model.Review): Observable<String>
 
     @GET("cmntCount/{rest}")
-    fun cmntCount(@Path("rest") id:Int): Observable<String>
+    fun cmntCount(@Path("rest") id: Int): Observable<String>
+
+
+    //==================================== rating ws ====================================
+
+    @GET("allRatings")
+    fun allRatings(@Query("rest") id: String): Observable<List<Model.Rating>>
+
+    @POST("insertRate")
+    fun insertRate(@Body rating: Model.Rating): Observable<String>
 }

@@ -1,9 +1,11 @@
 package com.mobelite.tourismguide
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
@@ -31,6 +33,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
+import com.mobelite.tourismguide.tools.PhoneGrantings
 
 class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMapClickListener, OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
@@ -101,6 +104,9 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
                               savedInstanceState: Bundle?): View? {
         val root = activity!!.layoutInflater.inflate(R.layout.map_dialog, container)
 
+        if (!PhoneGrantings.isNetworkAvailable(context!!))
+            Toast.makeText(context, "Offline mode", Toast.LENGTH_SHORT).show()
+
         val img = root.findViewById<ImageView>(R.id.cancelmapimg)
         img.setOnClickListener(this)
 
@@ -169,7 +175,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
         }
 
         if (type==1) {
-            mMap.setOnMapClickListener {  }
+            mMap.setOnMapClickListener { }
             mMap.setOnMarkerClickListener(this)
         }
 
@@ -274,7 +280,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
         //Snackbar.make(btnRequestDirection, "Success with status : " + direction.getStatus(), Snackbar.LENGTH_SHORT).show();
         Toast.makeText(context, "Searching for directions", Toast.LENGTH_SHORT).show()
 
-        println (direction.status)
+        println(direction.status)
         if (direction.isOK) {
             val route = direction.routeList[0]
             /*googleMap.addMarker(new MarkerOptions().position(origin));
@@ -317,19 +323,20 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
                 val location = this.mFusedLocationProviderClient!!.lastLocation
                 location.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "onComplete: found location!")
-                        currentLocation = task.result!!
-                        if (currentLocation!=null) {
-                            //origin= new LatLng( 36.170544, 10.170545);
-                            origin = LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
+                        if (CheckGpsStatus()) {
+                            currentLocation = task.result!!
+                            if (currentLocation!=null) {
+                                //origin= new LatLng( 36.170544, 10.170545);
+                                origin = LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
 
-                            requestDirection()
-                        } else {
-                            Toast.makeText(context, "Current Position unavailable!", Toast.LENGTH_SHORT).show()
+                                requestDirection()
+                            } else {
+                                Toast.makeText(context, "Current Position unavailable!", Toast.LENGTH_SHORT).show()
 
-                        }
-                        /* moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                        DEFAULT_ZOOM);*/
+                            }
+                        } else
+                            Toast.makeText(context, "Your GPS is off", Toast.LENGTH_SHORT).show()
+
 
                     } else {
                         Log.d(TAG, "onComplete: current location is null")
@@ -342,6 +349,13 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
             Log.e(TAG, "getDeviceLocation: SecurityException: " + e.message)
         }
 
+    }
+
+    fun CheckGpsStatus(): Boolean {
+
+        val locationManager = context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
     private fun askForLocationPermissions() {

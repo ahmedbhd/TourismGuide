@@ -1,8 +1,7 @@
-package com.mobelite.tourismguide.adapters
+package com.mobelite.tourismguide
 
 
 import android.annotation.SuppressLint
-import android.content.ContextWrapper
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -13,11 +12,13 @@ import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.ListView
+import android.widget.Toast
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.util.Attributes
-import com.mobelite.tourismguide.R
+import com.mobelite.tourismguide.adapters.HomeListAdapter
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
+import com.mobelite.tourismguide.tools.PhoneGrantings
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -42,10 +43,9 @@ class HomeFragment : Fragment() {
     private var disposable: Disposable? = null
 
     private fun selectMy() {
-        val prefs = activity!!.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
-        val iduser = prefs.getString("fb_id", null)
+
         disposable =
-                restaurantServices.selectmy(iduser)
+                restaurantServices.selectmy(PhoneGrantings.getSharedId(context!!))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -68,6 +68,8 @@ class HomeFragment : Fragment() {
         val actionBar = (activity as AppCompatActivity).supportActionBar
         actionBar!!.title = "Home"
 
+        if (!PhoneGrantings.isNetworkAvailable(context!!))
+            Toast.makeText(context, "Offline mode", Toast.LENGTH_SHORT).show()
 
         list = root.findViewById(R.id.listhome) as ListView
         //val list =listhome as ListView

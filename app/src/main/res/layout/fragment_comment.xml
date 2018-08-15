@@ -3,46 +3,74 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CommentFragment"
-    android:orientation="vertical">
+    android:background="@color/com_facebook_device_auth_text"
+    android:orientation="vertical"
+    tools:context=".CommentFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="84dp"
-        android:layout_marginBottom="5dp"
+        android:layout_height="100dp"
         android:gravity="top"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/cmnttext"
-            android:layout_width="wrap_content"
+            android:layout_width="300dp"
             android:layout_height="match_parent"
-            android:layout_marginRight="4dp"
-            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:layout_weight="1.5"
+            android:background="?attr/actionModeBackground"
             android:ems="10"
-            android:hint="type your comment "
-            android:inputType="text" />
+            android:hint="  Type your comment..."
+            android:inputType="textMultiLine"
 
-        <LinearLayout
+            android:maxLines="4"
+            android:minLines="3"
+            android:padding="3dp" />
+
+        <Button
+            android:id="@+id/savecmnt"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginLeft="4dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_margin="4dp"
+            android:layout_weight="0.4"
+            android:background="@android:drawable/screen_background_light"
+            android:padding="2dp"
+            android:text="Save"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textColor="@android:color/holo_orange_dark"
+            android:textSize="30sp" />
 
-            <Button
-                android:id="@+id/savecmnt"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="4dp"
-                android:background="@android:drawable/screen_background_light"
-                android:text="Save"
-                android:textAppearance="@style/TextAppearance.AppCompat"
-                android:textColor="@android:color/holo_orange_dark"
-                android:textSize="30sp" />
-        </LinearLayout>
     </LinearLayout>
+
+    <info.hoang8f.android.segmented.SegmentedGroup xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/segmentedcmnt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        segmentedgroup:sc_border_width="2dp"
+        segmentedgroup:sc_corner_radius="10dp">
+
+        <RadioButton
+            android:id="@+id/allcmnts"
+            style="@style/RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/actionModeBackground"
+            android:checked="true"
+            android:text="@string/all_comments" />
+
+        <RadioButton
+            android:id="@+id/minecmnt"
+            style="@style/RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/actionModeBackground"
+            android:text="@string/my_comments" />
+    </info.hoang8f.android.segmented.SegmentedGroup>
 
     <ListView
         android:id="@+id/cmntlist"

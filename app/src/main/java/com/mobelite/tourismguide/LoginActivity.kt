@@ -37,9 +37,7 @@ class LoginActivity : AppCompatActivity() {
         RestaurantServices.create()
     }
     private var disposable: Disposable? = null
-    var progressDialog :ProgressDialog?=null
-
-
+    var progressDialog: ProgressDialog? = null
 
 
     @SuppressLint("PackageManagerGetSignatures")
@@ -48,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         setSupportActionBar(toolbar)
         callbackManager = CallbackManager.Factory.create()
-        progressDialog  = ProgressDialog(this)
+        progressDialog = ProgressDialog(this)
         FacebookSdk.sdkInitialize(applicationContext)
         AppEventsLogger.activateApp(this)
         loginManager = LoginManager.getInstance()
@@ -64,7 +62,6 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this@LoginActivity, MainActivity::class.java)
             startActivity(intent)
         } else {
-
 
 
             loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
@@ -157,12 +154,11 @@ class LoginActivity : AppCompatActivity() {
             editor.apply() // This line is IMPORTANT !!!
 
 
-
         } catch (e: Exception) {
             Log.d(TAG, "BUNDLE Exception : " + e.toString())
         }
 
-        addUser(`object`.getString("id"),`object`.getString("email"))
+        addUser(`object`.getString("id"), `object`.getString("email"))
 
         return bundle
     }
@@ -200,23 +196,23 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun addUser(id:String , email: String) {
+    private fun addUser(id: String, email: String) {
         disposable =
-                restaurantServices.insertUser(Model.User(id,email))
+                restaurantServices.insertUser(Model.User(id, email))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 { result ->
                                     run {
 
-                                        if(result=="ok"){
+                                        if (result=="ok") {
 
                                             //Toast.makeText(this, "The user has been ADDED", Toast.LENGTH_SHORT).show()
 
                                         }
                                     }
                                 },
-                                { error ->println( error.message) }
+                                { error -> println(error.message) }
                         )
     }
 }

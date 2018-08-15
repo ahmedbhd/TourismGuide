@@ -24,4 +24,6 @@
     <string name="disconnect">Disconnect</string>
     <string name="add_restaurant">Add Restaurant</string>
     <string name="detail">Detail</string>
+    <string name="all_comments">All comments</string>
+    <string name="my_comments">My comments</string>
 </resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/com_facebook_device_auth_text"
+    android:orientation="horizontal"
+    android:paddingBottom="4dp"
+    android:paddingTop="4dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.7"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/mycmntcontent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1.5"
+            android:background="@android:color/background_light"
+            android:padding="4dp"
+            android:text="hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/datemycmnt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@android:color/background_light"
+            android:ems="10"
+            android:hapticFeedbackEnabled="false"
+            android:inputType="date"
+            android:padding="2dp"
+            android:text="@string/common_google_play_services_update_button"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_purple" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+
+        android:layout_margin="4dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/savemycmnt"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1.5"
+            android:background="@android:drawable/screen_background_light"
+            android:text="Update"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/deletemycmnt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_weight="0.15"
+            android:background="@android:drawable/screen_background_light"
+            android:text="Delete"
+            android:textColor="?attr/colorError" />
+    </LinearLayout>
+
+</LinearLayout>

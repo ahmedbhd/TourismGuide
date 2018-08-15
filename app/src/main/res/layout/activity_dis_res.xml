@@ -21,10 +21,11 @@
             <TextView
 
                 android:id="@+id/disactivitytitle"
-                android:layout_width="300dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
                 android:text="@string/detail"
+                android:textAlignment="center"
+                android:gravity="center"
                 android:textAppearance="@android:style/TextAppearance.Widget.TextView.PopupMenu"
                 android:visibility="visible" />
 

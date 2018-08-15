@@ -13,6 +13,8 @@ object Model {
 
 
 
-    data class Review(val id: Int , val comment: String, val iduser: String , val idres:Int , val date: Date)
+    data class Review(val id: Int, var comment: String, val iduser: String, val idres:Int, val date: Date)
+
+    data class Rating(val id: Int, var rate: Float, val iduser: String, val idres:Int)
 
 }

@@ -2,7 +2,6 @@ package com.mobelite.tourismguide.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
 import android.util.Log
@@ -23,9 +22,10 @@ import com.firebase.ui.storage.images.FirebaseImageLoader
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import com.mobelite.tourismguide.R
-import com.mobelite.tourismguide.UpdateResActivity
+import com.mobelite.tourismguide.SaveResActivity
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
+import com.mobelite.tourismguide.tools.PhoneGrantings
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -67,7 +67,7 @@ class HomeListAdapter(private val mContext: Context, private var favourites: Mut
 
         v!!.findViewById<Button>(R.id.open).setOnClickListener {
             //Toast.makeText(mContext, "click open", Toast.LENGTH_SHORT).show();
-            val intent = Intent(mContext, UpdateResActivity().javaClass)
+            val intent = Intent(mContext, SaveResActivity().javaClass)
             val res: Model.ResultRestaurant? = favourites[position]
             println("res ${res.toString()}")
             intent.putExtra("myObject", Gson().toJson(res))
@@ -134,10 +134,9 @@ class HomeListAdapter(private val mContext: Context, private var favourites: Mut
                         Toast.makeText(mContext, "Delete failed", Toast.LENGTH_SHORT).show()
                     }
         }
-        val prefs = mContext.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
-        val iduser = prefs.getString("fb_id", null)
+
         disposable =
-                restaurantServices.deleterest(iduser, id.toString())
+                restaurantServices.deleterest(PhoneGrantings.getSharedId(mContext), id.toString())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(

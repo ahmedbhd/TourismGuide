@@ -1,5 +1,6 @@
 package com.mobelite.tourismguide.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.mobelite.tourismguide.R
 import com.mobelite.tourismguide.data.webservice.Model
+import java.text.DateFormat
 
 class ListCommentAdapter(var data: MutableList<Model.Review>, var context: Context) : BaseAdapter() {
 
@@ -22,6 +24,7 @@ class ListCommentAdapter(var data: MutableList<Model.Review>, var context: Conte
         }
     }
 
+    @SuppressLint("InflateParams")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View?
         val viewHolder: ViewHolder
@@ -36,7 +39,8 @@ class ListCommentAdapter(var data: MutableList<Model.Review>, var context: Conte
         }
 
         val userDto = data[position]
-        viewHolder.txtdate?.text = userDto.date.toString()
+        viewHolder.txtdate?.text = DateFormat.getDateTimeInstance().format(userDto.date)
+
         viewHolder.txtComment?.text = userDto.comment
 
         return view as View

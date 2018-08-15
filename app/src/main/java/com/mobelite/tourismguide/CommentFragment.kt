@@ -1,26 +1,22 @@
 package com.mobelite.tourismguide
 
 
-import android.content.ContextWrapper
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListView
-import com.daimajia.swipe.util.Attributes
+import android.widget.*
 import com.mobelite.tourismguide.adapters.ListCommentAdapter
-import com.mobelite.tourismguide.adapters.ListViewAdapter
-import com.mobelite.tourismguide.data.roomservice.database.RestaurantRepository
-import com.mobelite.tourismguide.data.roomservice.local.RestaurantDataBase
-import com.mobelite.tourismguide.data.roomservice.local.RestaurantDataSource
-import com.mobelite.tourismguide.data.roomservice.model.Restaurant
+import com.mobelite.tourismguide.adapters.ListMyCommentAdapter
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
+import com.mobelite.tourismguide.tools.PhoneGrantings
+import info.hoang8f.android.segmented.SegmentedGroup
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 
 class CommentFragment : DialogFragment() {
@@ -35,8 +31,13 @@ class CommentFragment : DialogFragment() {
             return frag
         }
     }
+
+    var cmnt: EditText? = null
     private var mAdapter: ListCommentAdapter? = null
     var list: ListView? = null
+    var segment: SegmentedGroup? = null
+    var allcomments: RadioButton? = null
+
     private val restaurantServices by lazy {
         RestaurantServices.create()
     }
@@ -49,14 +50,33 @@ class CommentFragment : DialogFragment() {
 
         list = root.findViewById(R.id.cmntlist)
 
-        getComments()
+        val save = root.findViewById<Button>(R.id.savecmnt)
+        cmnt = root.findViewById(R.id.cmnttext)
+        save.setOnClickListener {
+            if (cmnt!!.text.isEmpty())
+                Toast.makeText(activity!!, "Empty Comment", Toast.LENGTH_SHORT).show()
+            else
+                insertCmnt()
+        }
+
+        allcomments = root.findViewById(R.id.allcmnts)
+        segment = root.findViewById(R.id.segmentedcmnt)
+        //segment!!.setTintColor(Color.DKGRAY)
+        segment!!.setOnCheckedChangeListener { g, i ->
+            when (i) {
+                R.id.allcmnts -> getAllComments()
+                R.id.minecmnt -> getMyComments()
+            }// Nothing to do
+        }
+        getAllComments()
+
 
 
         return root
     }
 
 
-    private fun getComments() {
+    private fun getAllComments() {
 
 
         disposable =
@@ -65,12 +85,51 @@ class CommentFragment : DialogFragment() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 { result ->
-                                    mAdapter = ListCommentAdapter( result as MutableList<Model.Review>, context!!)
+                                    mAdapter = ListCommentAdapter(result as MutableList<Model.Review>, context!!)
 
                                     list!!.adapter = mAdapter
                                     mAdapter!!.notifyDataSetChanged()
 
 
+                                },
+                                { error -> println(error.message) }
+                        )
+    }
+
+    private fun getMyComments() {
+
+        println(PhoneGrantings.getSharedId(context!!))
+        print(arguments!!.getString("id"))
+        disposable =
+                restaurantServices.myCmnts(PhoneGrantings.getSharedId(context!!), arguments!!.getString("id"))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { result ->
+                                    val myAdapter = ListMyCommentAdapter(result as MutableList<Model.Review>, context!!)
+                                    list!!.adapter = myAdapter
+                                    myAdapter.notifyDataSetChanged()
+
+
+                                },
+                                { error -> println(error.message) }
+                        )
+    }
+
+    private fun insertCmnt() {
+
+
+        disposable =
+                restaurantServices.insertCmnt(Model.Review(0, cmnt!!.text.toString(), PhoneGrantings.getSharedId(activity!!), arguments!!.getString("id").toInt(), Date()))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { result ->
+                                    if (result=="ok") {
+                                        cmnt!!.text.clear()
+                                        allcomments!!.isChecked = true
+                                        getAllComments()
+                                    }
                                 },
                                 { error -> println(error.message) }
                         )

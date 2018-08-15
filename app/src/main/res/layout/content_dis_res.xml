@@ -23,19 +23,48 @@
         app:layout_constraintVertical_chainStyle="spread_inside"
         app:srcCompat="@drawable/restaurantimg" />
 
-    <TextView
-        android:id="@+id/cmntnbr"
-        android:layout_width="wrap_content"
-        android:layout_height="19dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="313dp"
-        android:clickable="true"
-        android:text="TextView"
-        android:textColor="@android:color/holo_blue_bright"
-        android:textStyle="italic"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/ratinglayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dislocimage_d" />
+        app:layout_constraintTop_toBottomOf="@+id/dislocimage_d">
+
+        <com.willy.ratingbar.ScaleRatingBar xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/simpleRatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:srb_clearRatingEnabled="true"
+            app:srb_clickable="true"
+            app:srb_drawableEmpty="@drawable/empty"
+            app:srb_drawableFilled="@drawable/full"
+            app:srb_isIndicator="false"
+            app:srb_minimumStars="0"
+            app:srb_numStars="5"
+            app:srb_rating="0"
+            app:srb_scrollable="true"
+            app:srb_starPadding="5dp"
+
+            app:srb_stepSize="0.5">
+
+        </com.willy.ratingbar.ScaleRatingBar>
+        <TextView
+            android:id="@+id/cmntnbr"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_marginEnd="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="right"
+            android:text="TextView"
+            android:textColor="@android:color/holo_blue_bright"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
 
     <TextView
         android:id="@+id/disname"
@@ -52,7 +81,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cmntnbr"
+        app:layout_constraintTop_toBottomOf="@+id/ratinglayout"
         tools:fontFamily="casual" />
 
     <TextView
@@ -75,6 +104,7 @@
 
 
     <TextView
+        android:lines="3"
         android:id="@+id/disDesc"
         android:layout_width="242dp"
         android:layout_height="wrap_content"
@@ -134,7 +164,7 @@
             android:layout_marginBottom="0dp"
             android:gravity="bottom|center"
             app:backgroundTint="@android:color/holo_red_dark"
-            app:srcCompat="@drawable/heart"
+            app:srcCompat="@drawable/empty_heart"
             tools:layout_editor_absoluteX="172dp"
             tools:layout_editor_absoluteY="478dp" />
     </RelativeLayout>

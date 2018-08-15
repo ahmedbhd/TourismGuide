@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".UpdateResActivity"
+    tools:context=".SaveResActivity"
     tools:showIn="@layout/activity_update_res">
 
 
@@ -119,8 +119,9 @@
             android:layout_marginBottom="0dp"
             android:gravity="bottom|center"
             app:backgroundTint="@android:color/holo_red_dark"
-            app:srcCompat="@drawable/update"
+            app:srcCompat="@drawable/save"
             tools:layout_editor_absoluteX="172dp"
             tools:layout_editor_absoluteY="478dp" />
+
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

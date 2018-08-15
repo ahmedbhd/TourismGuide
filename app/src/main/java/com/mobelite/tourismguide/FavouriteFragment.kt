@@ -2,16 +2,12 @@ package com.mobelite.tourismguide
 
 
 import android.annotation.SuppressLint
-import android.content.ContextWrapper
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
-import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
 import com.daimajia.swipe.SwipeLayout
@@ -54,15 +50,14 @@ class FavouriteFragment : Fragment() {
     private var disposable: Disposable? = null
 
     private fun selectFav() {
-        val prefs = activity!!.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
-        val iduser = prefs.getString("fb_id", null)
+
 
         val restaurantDataBase = RestaurantDataBase.getInstance(activity!!)
         restaurantRepository = RestaurantRepository.getInstance(RestaurantDataSource.getInstance(restaurantDataBase.restaurantDAO()))
         deleteAllOfflineData()
 
         disposable =
-                restaurantServices.selectfav(iduser)
+                restaurantServices.selectfav(PhoneGrantings.getSharedId(context!!))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(

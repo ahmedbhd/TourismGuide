@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.facebook.login.LoginManager
-import com.mobelite.tourismguide.adapters.HomeFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 

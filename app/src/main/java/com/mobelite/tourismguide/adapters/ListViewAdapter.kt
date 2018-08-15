@@ -2,10 +2,8 @@ package com.mobelite.tourismguide.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
-
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +25,7 @@ import com.mobelite.tourismguide.DisResActivity
 import com.mobelite.tourismguide.R
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
+import com.mobelite.tourismguide.tools.PhoneGrantings
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -120,10 +119,9 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
     private var disposable: Disposable? = null
 
     private fun delFav(id: Int, position: Int) {
-        val prefs = mContext.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
-        val iduser = prefs.getString("fb_id", null)
+
         disposable =
-                restaurantServices.deletefav(iduser, id.toString())
+                restaurantServices.deletefav(PhoneGrantings.getSharedId(mContext), id.toString())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -135,7 +133,7 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
 
                                             Toast.makeText(mContext, "Delete succeeded", Toast.LENGTH_SHORT).show()
 
-                                            favourites.remove(favourites[position])
+                                            favourites.removeAt(position)
                                             notifyDataSetChanged()
 
                                         }

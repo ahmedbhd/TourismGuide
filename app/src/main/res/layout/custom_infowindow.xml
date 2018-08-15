@@ -80,6 +80,12 @@
             app:layout_constraintStart_toEndOf="@+id/clientPic"
             app:layout_constraintTop_toBottomOf="@+id/titleWifi" />
 
+        <ImageView
+            android:id="@+id/imageHeart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/like" />
+
     </RelativeLayout>
 
 

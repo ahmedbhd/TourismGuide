@@ -25,29 +25,30 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.daimajia.swipe.util.Attributes
 import com.firebase.ui.storage.images.FirebaseImageLoader
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
+import com.mobelite.tourismguide.adapters.ListViewAdapter
+import com.mobelite.tourismguide.data.roomservice.database.RestaurantRepository
+import com.mobelite.tourismguide.data.roomservice.local.RestaurantDataBase
+import com.mobelite.tourismguide.data.roomservice.local.RestaurantDataSource
+import com.mobelite.tourismguide.data.roomservice.model.Restaurant
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
+import com.mobelite.tourismguide.tools.PhoneGrantings
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 
-class MapsFragment : Fragment() ,
-    OnMapReadyCallback ,
-    GoogleMap.OnMarkerClickListener,
-    GoogleMap.OnInfoWindowClickListener{
+class MapsFragment : Fragment(),
+        OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener,
+        GoogleMap.OnInfoWindowClickListener {
 
 
     private val restaurantServices by lazy {
@@ -55,7 +56,8 @@ class MapsFragment : Fragment() ,
     }
     private var disposable: Disposable? = null
 
-    var res: Model.ResultRestaurant?=null
+    var res: Model.ResultRestaurant? = null
+
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private const val TAG = "LocationPickerActivity"
@@ -69,9 +71,9 @@ class MapsFragment : Fragment() ,
     }
 
 
+    private var restaurants: ArrayList<Model.ResultRestaurant>? = null
+    private var favourites: ArrayList<Model.ResultRestaurant>? = null
 
-
-    private var restaurants : ArrayList<Model.ResultRestaurant>? = null
     private var mLocationPermissionsGranted: Boolean? = false
     private var mFusedLocationProviderClient: FusedLocationProviderClient? = null
     private var currentLocation: Location? = null
@@ -85,7 +87,6 @@ class MapsFragment : Fragment() ,
     private var listener: OnFragmentInteractionListener? = null
 
 
-
     internal inner class CustomInfoWindowAdapter : GoogleMap.InfoWindowAdapter {
         private var popup: View? = null
         private val inflater: LayoutInflater? = null
@@ -97,8 +98,8 @@ class MapsFragment : Fragment() ,
         @SuppressLint("InflateParams")
         override fun getInfoWindow(marker: Marker): View? {
 
-            val ch:String = marker.title
-            val d : String =  ch.substring(0, ch.indexOf("/"))
+            val ch: String = marker.title
+            val d: String = ch.substring(0, ch.indexOf("/"))
             val indexloc = ch.substring(ch.indexOf("/") + 1, ch.length)
             try {
 
@@ -107,19 +108,24 @@ class MapsFragment : Fragment() ,
                 popup!!.isClickable = true
                 // Getting reference to the TextView to set latitude
                 val wifiTxt = popup!!.findViewById(R.id.titleWifi) as TextView
-                wifiTxt.text=(d)
+                wifiTxt.text = (d)
 
                 val passTxt = popup!!.findViewById(R.id.passworWifi) as TextView
-                passTxt.text=(marker.snippet)
+                passTxt.text = (marker.snippet)
                 val imgWifi = popup!!.findViewById(R.id.clientPic) as ImageView
+
+                val imgHeart = popup!!.findViewById(R.id.imageHeart) as ImageView
 //                Picasso.with(context)
 //
 //                        .load(p.getImg())
 //                        .into(imgWifi)
-                val loca : Model.ResultRestaurant = restaurants!![(Integer.valueOf(indexloc))]
+                val loca: Model.ResultRestaurant = restaurants!![(Integer.valueOf(indexloc))]
+
+                if (favourites!!.indexOf(loca)<0)
+                    imgHeart.visibility = View.GONE
 
                 if (loca.image!="no image") {
-                    val storage  = FirebaseStorage.getInstance()
+                    val storage = FirebaseStorage.getInstance()
                     val storageRef = storage.reference
                     val imageRef2 = storageRef.child(loca.image)
                     Glide.with(context /* context */)
@@ -140,8 +146,6 @@ class MapsFragment : Fragment() ,
             return popup
         }
     }
-
-
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -165,7 +169,7 @@ class MapsFragment : Fragment() ,
         val flotadd = root.findViewById(R.id.fabadd) as FloatingActionButton
         flotadd.setOnClickListener {
 
-            val intent = Intent(context, UpdateResActivity().javaClass)
+            val intent = Intent(context, SaveResActivity().javaClass)
 
             requireActivity().startActivity(intent)
 
@@ -185,13 +189,27 @@ class MapsFragment : Fragment() ,
                                     run {
                                         println(result)
                                         restaurants = result as ArrayList<Model.ResultRestaurant>?
-                                        addMarkers()
+                                        selectFav()
                                     }
                                 },
-                                { error ->println( error.message) }
+                                { error -> println(error.message) }
                         )
     }
 
+    private fun selectFav() {
+
+        disposable =
+                restaurantServices.selectfav(PhoneGrantings.getSharedId(context!!))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { result ->
+                                    favourites = result as ArrayList<Model.ResultRestaurant>?
+                                    addMarkers()
+                                },
+                                { error -> println(error.message) }
+                        )
+    }
 
     fun onButtonPressed(uri: Uri) {
         listener?.onFragmentInteraction(uri)
@@ -233,15 +251,15 @@ class MapsFragment : Fragment() ,
                         Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(activity!!,
                         Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED) {
             askForLocationPermissions()
-            println ("hey")
+            println("hey")
         } else {
             val intent = Intent(activity!!, DisResActivity().javaClass)
 
 
 
-            restaurants!!.forEach {t ->
+            restaurants!!.forEach { t ->
                 if (t.lat==marker.position.latitude.toString() && t.lng==marker.position.longitude.toString())
-                   res = t
+                    res = t
             }
 
             println("res ${res.toString()}")
@@ -254,24 +272,34 @@ class MapsFragment : Fragment() ,
 
     }
 
-    private  fun addMarkers(){
+    private fun addMarkers() {
 
-        restaurants!!.forEach{ r ->
-            googleMap!!.addMarker(MarkerOptions().position(LatLng(r.lat.toDouble(),r.lng.toDouble() ))
-                .title(r.name+"/"+restaurants!!.indexOf(r))
-                .snippet(r.phone))
+        val builder: LatLngBounds.Builder = LatLngBounds.builder()
+
+        restaurants!!.forEach { r ->
+            builder.include(LatLng(r.lat.toDouble(), r.lng.toDouble()))
+            googleMap!!.addMarker(MarkerOptions().position(LatLng(r.lat.toDouble(), r.lng.toDouble()))
+                    .title(r.name + "/" + restaurants!!.indexOf(r))
+                    .snippet(r.phone))
         }
+
+        val bounds: LatLngBounds = builder.build()
+
+        val padding = 50     // offset from edges of the map in pixels
+        val cu: CameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+        googleMap!!.animateCamera(cu)
+
     }
+
     override fun onMapReady(mMap: GoogleMap) {
         val cameraPosition = CameraPosition.Builder()
-                .target(LatLng(36.731742 , 10.237638))// set the camera's center position
+                .target(LatLng(36.731742, 10.237638))// set the camera's center position
                 .zoom(9f)  // set the camera's zoom level
                 .tilt(20f)  // set the camera's tilt
                 .build()
 
         // Move the camera to that position
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-
 
 
 //        mMap.addMarker(MarkerOptions().position(origin)
@@ -281,7 +309,7 @@ class MapsFragment : Fragment() ,
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.setInfoWindowAdapter(CustomInfoWindowAdapter())
         mMap.setOnInfoWindowClickListener(this)
-        mMap.setOnMarkerClickListener (this)
+        mMap.setOnMarkerClickListener(this)
         //mMap.setOnInfoWindowClickListener { println("hi") }
         Log.d("mLocation", mLocationPermissionsGranted.toString())
         if (this.mLocationPermissionsGranted!!) {
@@ -303,7 +331,6 @@ class MapsFragment : Fragment() ,
 
 
     }
-
 
 
     override fun onMarkerClick(marker: Marker): Boolean {
@@ -366,9 +393,6 @@ class MapsFragment : Fragment() ,
         Log.d(TAG, "initMap: initializing map")
         mMapView.getMapAsync(this)
     }
-
-
-
 
 
     private fun askForLocationPermissions() {

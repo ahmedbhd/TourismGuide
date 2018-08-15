@@ -30,7 +30,7 @@
             android:name=".AddResActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".UpdateResActivity"
+            android:name=".SaveResActivity"
 
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
