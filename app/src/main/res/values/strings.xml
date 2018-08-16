@@ -26,4 +26,5 @@
     <string name="detail">Detail</string>
     <string name="all_comments">All comments</string>
     <string name="my_comments">My comments</string>
+    <string name="_0_commentes">0 commentes</string>
 </resources>

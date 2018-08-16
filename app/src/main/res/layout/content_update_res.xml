@@ -33,13 +33,17 @@
         android:layout_marginTop="4dp"
         android:gravity="center_vertical|center"
         android:hint="Name"
+        android:imeOptions="actionNext"
+        android:inputType="text"
         android:textSize="14sp"
         android:textStyle="bold"
+        android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@+id/Uptlf"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Uplocimage_d"
-        tools:fontFamily="casual" />
+        tools:fontFamily="casual"
+        />
 
     <EditText
         android:id="@+id/Uptlf"
@@ -57,9 +61,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Upname"
-        tools:fontFamily="casual" />
+        tools:fontFamily="casual"
+        android:imeOptions="actionNext"/>
 
-    <MultiAutoCompleteTextView
+    <EditText
         android:id="@+id/UpDesc"
         android:layout_width="242dp"
         android:layout_height="60dp"
@@ -69,15 +74,16 @@
         android:ems="10"
         android:fontFamily="monospace"
         android:hint="Description..."
-        android:inputType="textMultiLine"
-        android:maxLines="2"
+        android:inputType="text"
+        android:maxLines="3"
         android:textAlignment="center"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Uptlf"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        android:imeOptions="actionDone"/>
 
 
     <RelativeLayout

@@ -16,6 +16,12 @@ interface RestaurantDAO {
     @Insert
     fun insertRestaurant(vararg restaurant: Restaurant)
 
+    @Query("SELECT * FROM restaurant WHERE Fav==1")
+    fun getFavourites(): Flowable<List<Restaurant>>
+
+    @Query("SELECT * FROM restaurant WHERE UserID=:ID")
+    fun getMyRestaurants(ID:String): Flowable<List<Restaurant>>
+
 //    @Update
 //    fun updateRestaurant(vararg restaurant: Restaurant)
 //

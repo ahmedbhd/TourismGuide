@@ -58,12 +58,10 @@ class LoginActivity : AppCompatActivity() {
 
         val prefs = getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
 
-        if (prefs.getString("fb_id", null)!=null) {
+        if (prefs.getString("fb_id", null)!=null) { // check if user is already logged in
             val intent = Intent(this@LoginActivity, MainActivity::class.java)
             startActivity(intent)
-        } else {
-
-
+        } else { // load data from facebook
             loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
 
@@ -158,6 +156,7 @@ class LoginActivity : AppCompatActivity() {
             Log.d(TAG, "BUNDLE Exception : " + e.toString())
         }
 
+        // add user to data base
         addUser(`object`.getString("id"), `object`.getString("email"))
 
         return bundle
@@ -196,6 +195,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    //============================= add/update user to data base ==============================
     private fun addUser(id: String, email: String) {
         disposable =
                 restaurantServices.insertUser(Model.User(id, email))

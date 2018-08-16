@@ -56,20 +56,30 @@ class ListMyCommentAdapter(var data: MutableList<Model.Review>, var context: Con
 
         viewHolder.txtComment?.setText(userDto.comment)
 
+        // adding new comment is only available online
         viewHolder.save!!.setOnClickListener {
-            if (viewHolder.txtComment!!.text.isEmpty())
-                Toast.makeText(context, "Empty comment!", Toast.LENGTH_SHORT).show()
-            else {
-                println(viewHolder.txtComment!!.text.toString())
-                updateCmnt(Model.Review(userDto.id, viewHolder.txtComment!!.text.toString(), PhoneGrantings.getSharedId(context), userDto.idres, userDto.date), position)
+            when {
+                (!PhoneGrantings.isNetworkAvailable(context))
+                -> Toast.makeText(context, "Internet is required for this feature", Toast.LENGTH_SHORT).show()
+                (viewHolder.txtComment!!.text.isEmpty())
+                -> Toast.makeText(context, "Empty comment!", Toast.LENGTH_SHORT).show()
+                else
+                -> {
+                    println(viewHolder.txtComment!!.text.toString())
+                    updateCmnt(Model.Review(userDto.id, viewHolder.txtComment!!.text.toString(), PhoneGrantings.getSharedId(context), userDto.idres, userDto.date), position)
+                }
             }
         }
 
+        // deleting comment is only available online
         viewHolder.delete!!.setOnClickListener {
-            dleteCmnt(userDto.id.toString(), position)
+            if (!PhoneGrantings.isNetworkAvailable(context))
+                Toast.makeText(context, "Internet is required for this feature", Toast.LENGTH_SHORT).show()
+            else
+                dleteCmnt(userDto.id.toString(), position)
         }
 
-        return view as View
+        return view
     }
 
     override fun getItem(i: Int): Model.Review {
@@ -84,6 +94,7 @@ class ListMyCommentAdapter(var data: MutableList<Model.Review>, var context: Con
         return data.size
     }
 
+    //=============================== update the comment in data base ===============================
     private fun updateCmnt(r: Model.Review, pos: Int) {
 
 
@@ -103,7 +114,7 @@ class ListMyCommentAdapter(var data: MutableList<Model.Review>, var context: Con
                         )
     }
 
-
+    //=============================== delete the comment from data base ===============================
     private fun dleteCmnt(id: String, pos: Int) {
 
 

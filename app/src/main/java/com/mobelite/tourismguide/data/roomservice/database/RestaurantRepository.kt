@@ -15,6 +15,15 @@ class RestaurantRepository(private val mLocationDataSource: IRestaurantDataSourc
         mLocationDataSource.insertRestaurant(*restaurant)
     }
 
+
+    override fun getFavourites(): Flowable<List<Restaurant>> {
+    
+        return mLocationDataSource.getFavourites()
+    }
+
+    override fun getMyRestaurants(id: String): Flowable<List<Restaurant>> {
+        return mLocationDataSource.getMyRestaurants(id)
+    }
 //    override fun updateRestaurant(vararg restaurant: Restaurant) {
 //        mLocationDataSource.updateRestaurant(*restaurant)
 //    }

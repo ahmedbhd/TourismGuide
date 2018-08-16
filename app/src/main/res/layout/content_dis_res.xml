@@ -58,7 +58,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="right"
-            android:text="TextView"
+            android:text="@string/_0_commentes"
             android:textColor="@android:color/holo_blue_bright"
             android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -119,6 +119,8 @@
         android:maxLines="2"
         android:textAlignment="center"
         android:textSize="14sp"
+        android:ellipsize="end"
+
         app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

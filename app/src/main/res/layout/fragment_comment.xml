@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/com_facebook_device_auth_text"
     android:orientation="vertical"
-    tools:context=".CommentFragment">
+    tools:context=".CommentDiagFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout

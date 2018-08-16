@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "tourismguide-3436d",
+  "private_key_id": "2da912d507925b92d953e5be1b6dfb8ec8597b90",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCIuZiJ11ps8eY8\nAcILO0PvCU4EvhQXcFyWb4MUWfr/3QqNcsWoR8GWbycILu835dW2LOaHkHM/Epzz\nJ3lq+YUc0H2xI+cn9lhRaP4RkZRpY8IZx7Z2AAdYvPNpxCLWAonefboK5XszgBVs\nlsl3n0X5UXoKO5CxOjZuU5FkKUM3GtIoIn4FiCIf3uirzCFhN1qO/b3hVrlUfZEi\nthYrhOGxcY6uYKAwjL6HqFm1OUOJFGTS9fd6/7aSQuUypFXUHHltsw4DbXIqNLBD\nCtKcArgeIohi/kFxB2gGLG0IYEdaZSv7U+FOFbzR8pvPWFdxXRWLgx30DC+XXCS8\npLqe3m8rAgMBAAECggEAOXKGEbC/KVRwcRkp/48cyaSGt/5nsbt/46OiF1yBVp15\nEBq/yyevQvacF1elIr76z0tJZ399tOwsrwwQe66wy/0cOuBDgWqEDFzJl/crvSZx\nyWQ9GZKEg7gMrI2BN5ukcywvjeGDJQ31soUezJjLDWk7Fm6VqqmzciLBzax6tf19\nRLnVlyRo3LCXg4rW7AYPcV9jb4iM7s68Jc2D8t3AlocWNUlTSzdYeWTobeTi2831\njt+I9tytB24JScu1DVB3hmdrCVYoOF6lArZQB2cbsptQZAdIbYDSrm6CQzhQ74xw\n+l4JwPg3D1svIgAotyYdZny4G0ovVrLqFTP1LqD+1QKBgQC72X5X3+IIUGMP7BNq\ntTGmEq4XdFAh/iLwsdylLVZjJp7whj17tq0pwe4jBRbyvmmI4cN5byr2R4M1R+4+\nGSTJci4Ywz54tT9QQlxtRmcTER36G/gtOJpgDSkzEzQtyWuX8RuFetJyrIG0q79H\n5MOBC1+XIdcNDmFkXDjYfkhP3QKBgQC6U+lYsGchFZKJxGFtO8mUHpxZnxpS5o3q\n1URILmbpfVAbmVpRZcgjOppEWMdhuCLTYaUtuSYrH+dyhcy8gXnq9likFUNju4Dl\nqdP2NoXk4C3wtoEOi/bUnXYI6ktZdaExnfM1VPxAvL5OyDxqpl4RBAC2zmSncBgp\n7R0J44FOpwKBgAwf353AX5B1z88JR7+NbmTvs7jj0wA+rPaoJDutD3Ra28tefr1r\nbwXQ9JPiEjccvycMm1dNK5K1zuwzdlcfvFYcPoluoKud1zZQ8jJDZwe+BRdNktko\nXB5y+wPG64lBBObLsyEMamToaX7FzxTO2SeNGmBg2MaI9RRLN4gRro0pAoGAcrUZ\n4Kmos6tuLTYirHa0IGW/50SVlhetorZsdOtsG64z1OnRum6oiVeYhR8Kj9QmTG++\nmqlzH/ViLRTF9/7VqZrC8zDL7egO8FRe0yK5xy9j2N7iEKyF5lqRwedLP+W0uLD+\newS4zrnjhuiqmRWWr28BaYkiWhoeJiF9UQsoHd0CgYA3dK77W017e2yMaZq9NUQZ\nyPyk95LGl516VLxt4eKDDFYRZxL4FbEzyeWt+spBQNXuAV1cDSV4NsyBcxC5U8zT\nTzJE408dxloq9IoVKec8/ACPwplrAetMX0EVryu5C3phu3P0doKbXyGuRlYAweD5\n5rBMSgOD75tLHryBNg9/7g==\n-----END PRIVATE KEY-----\n",
+  "client_email": "tourismguide-3436d@appspot.gserviceaccount.com",
+  "client_id": "111308503537419040794",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/tourismguide-3436d%40appspot.gserviceaccount.com"
+}

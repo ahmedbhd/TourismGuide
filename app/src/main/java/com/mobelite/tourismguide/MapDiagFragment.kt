@@ -12,7 +12,6 @@ import android.os.SystemClock
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -34,19 +33,25 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.mobelite.tourismguide.tools.PhoneGrantings
+import noman.googleplaces.NRPlaces
+import noman.googleplaces.Place
+import noman.googleplaces.PlacesException
+import noman.googleplaces.PlacesListener
 
+@Suppress("DEPRECATION")
 class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMapClickListener, OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
-        DirectionCallback {
+        DirectionCallback, PlacesListener {
 
 
-    fun newInstance(title: String, lat: Double, lng: Double, type: Int): MapDialogFragment {
+    fun newInstance(title: String, lat: Double, lng: Double, type: Int, image: String): MapDialogFragment {
         val frag = MapDialogFragment()
         val args = Bundle()
         args.putString("title", title)
         args.putDouble("lat", lat)
         args.putDouble("lng", lng)
         args.putInt("type", type)
+        args.putString("image", image)
         frag.arguments = args
         return frag
     }
@@ -54,7 +59,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private const val TAG = "LocationPickerActivity"
-        private const val serverKey = "AIzaSyDbkY2fSN15Fgt8pTU6YzgcnUf-Hf5k04A"
+        private const val serverKey = "AIzaSyChzlfg8hqme9giklQu01mvY7on6uDh180"
         private const val FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
         private const val COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION
 
@@ -72,6 +77,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
     private var googleMap: GoogleMap? = null
     private var type: Int = 0
 
+
     override fun onClick(v: View?) {
         val listener = activity as MapDialogFragmentListener?
         listener!!.onFinishEditDialog(destination!!)
@@ -84,22 +90,6 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
         fun onFinishEditDialog(pos: LatLng)
     }
 
-
-//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-//        val title = arguments!!.getString("Maps")
-//        val alertDialogBuilder = AlertDialog.Builder(activity!!)
-//        alertDialogBuilder.setTitle(title)
-//        alertDialogBuilder.setMessage("Are you sure?")
-//        alertDialogBuilder.setPositiveButton("OK") { dialog, which ->
-//            // on success
-//        }
-//        alertDialogBuilder.setNegativeButton("Cancel") { dialog, which ->
-//            dialog?.dismiss()
-//        }
-//
-//        return alertDialogBuilder.create()
-//    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val root = activity!!.layoutInflater.inflate(R.layout.map_dialog, container)
@@ -110,15 +100,25 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
         val img = root.findViewById<ImageView>(R.id.cancelmapimg)
         img.setOnClickListener(this)
 
-        if (arguments!=null) {
+        if (arguments!=null) { // check if marker position is pre-determined
             destination = LatLng(arguments!!.getDouble("lat"), arguments!!.getDouble("lng"))
             type = arguments!!.getInt("type")
+
+            // Loading the surrounding places of the restaurant from google maps.
+            NRPlaces.Builder()
+                    .listener(this)
+                    .key(serverKey)
+                    .latlng(destination!!.latitude, destination!!.longitude)
+                    .radius(1500)
+                    .build()
+                    .execute()
         }
 
         mMapView = root.findViewById(R.id.mapdialog)
         mMapView.onCreate(savedInstanceState)
 
 
+        //loading map
         getLocationPermission()
 
 
@@ -153,20 +153,22 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
 
 
     override fun onMapReady(mMap: GoogleMap) {
+
         val cameraPosition = CameraPosition.Builder()
                 .target(destination) // set the camera's center position
-                .zoom(9f)  // set the camera's zoom level
+                .zoom(15f)  // set the camera's zoom level
                 .tilt(20f)  // set the camera's tilt
                 .build()
 
         // Move the camera to that position
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
 
-
-
         mMap.addMarker(MarkerOptions().position(destination!!)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                 .draggable(false))
+
+
+
 
 
         if (type==0) {
@@ -203,6 +205,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
     }
 
 
+    // add new marker to the clicked point by user
     override fun onMapClick(p0: LatLng?) {
         googleMap!!.clear()
         googleMap!!.addMarker(MarkerOptions().position(p0!!)
@@ -240,6 +243,8 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
+
+        // building animation for marker when its clicked
         val handler = Handler()
         val start = SystemClock.uptimeMillis()
         val duration: Long = 1500
@@ -259,13 +264,15 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
                 }
             }
         })
-        destination = marker.position
-        getDeviceLocation()
+
+        if (marker.position==destination) // only building a route to the restaurant position
+            getDeviceLocation()
 
 
         return false
     }
 
+    // loading direction route from device location to marker's
     private fun requestDirection() {
         //Snackbar.make(btnRequestDirection, "Direction Requesting...", Snackbar.LENGTH_SHORT).show();
         println("origin: $origin  destination: $destination")
@@ -281,7 +288,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
         Toast.makeText(context, "Searching for directions", Toast.LENGTH_SHORT).show()
 
         println(direction.status)
-        if (direction.isOK) {
+        if (direction.isOK) { // building the route in map if its found
             val route = direction.routeList[0]
             /*googleMap.addMarker(new MarkerOptions().position(origin));
             googleMap.addMarker(new MarkerOptions().position(destination));*/
@@ -298,6 +305,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
         }
     }
 
+    // move map's camera to the direction route
     private fun setCameraWithCoordinationBounds(route: Route) {
         val southwest = route.bound.southwestCoordination.coordination
         val northeast = route.bound.northeastCoordination.coordination
@@ -312,6 +320,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
     }
 
 
+    // loading the current diavace loaction
     private fun getDeviceLocation() {
         Log.d(TAG, "getDeviceLocation: getting the devices current location")
 
@@ -329,6 +338,7 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
                                 //origin= new LatLng( 36.170544, 10.170545);
                                 origin = LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
 
+                                // calling for direction when device location found
                                 requestDirection()
                             } else {
                                 Toast.makeText(context, "Current Position unavailable!", Toast.LENGTH_SHORT).show()
@@ -392,6 +402,37 @@ class MapDialogFragment : DialogFragment(), View.OnClickListener, GoogleMap.OnMa
             // app-defined int constant. The callback method gets the
             // result of the request.
         }
+    }
+
+    override fun onPlacesFailure(e: PlacesException?) {
+        //Toast.makeText(context, "No surrounding places found", Toast.LENGTH_SHORT).show()
+        Log.i("PlacesAPI", "onPlacesFailure()");
+
+    }
+
+    override fun onPlacesSuccess(places: MutableList<Place>?) {
+        Log.i("PlacesAPI", "onPlacesSuccess()")
+
+        activity!!.runOnUiThread {
+            // adding the found places from google to the map
+            places?.forEach { place ->
+
+                val latLng = LatLng(place.latitude, place.longitude)
+                googleMap!!.addMarker(MarkerOptions().position(latLng)
+                        .title(place.name).snippet(place.vicinity));
+
+
+            }
+        }
+
+    }
+
+    override fun onPlacesFinished() {
+        Log.i("PlacesAPI", "onPlacesFinished()");
+    }
+
+    override fun onPlacesStart() {
+        Log.i("PlacesAPI", "onPlacesStart()");
     }
 
     override fun onResume() {

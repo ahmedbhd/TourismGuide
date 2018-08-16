@@ -30,7 +30,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-class ListViewAdapter(private val mContext: Context, private var favourites: MutableList<Model.ResultRestaurant>, private val manager: FragmentActivity?) : BaseSwipeAdapter() {
+// Online Favourite list Adapter
+class FavListViewAdapter(private val mContext: Context, private var favourites: MutableList<Model.ResultRestaurant>, private val manager: FragmentActivity?) : BaseSwipeAdapter() {
     override fun getCount(): Int {
         return favourites.count()
     }
@@ -57,17 +58,19 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
 
 
         swipeLayout.setOnDoubleClickListener { _, _ -> Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show() }
+
+        // delete action
         v.findViewById<Button>(R.id.delete).setOnClickListener {
-            // Toast.makeText(mContext, "click delete", Toast.LENGTH_SHORT).show()
             delFav(favourites[position].id, position)
         }
 
+        // display the details in detail activity
         v.findViewById<Button>(R.id.open).setOnClickListener {
             //Toast.makeText(mContext, "click open", Toast.LENGTH_SHORT).show();
             val intent = Intent(mContext, DisResActivity().javaClass)
             val res: Model.ResultRestaurant? = favourites[position]
             println("res ${res.toString()}")
-            intent.putExtra("myObject", Gson().toJson(res))
+            intent.putExtra("myObject2", Gson().toJson(res))
             manager!!.startActivity(intent)
 
         }
@@ -76,8 +79,7 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
 
     @SuppressLint("SetTextI18n")
     override fun fillValues(position: Int, convertView: View) {
-        //val t = convertView.findViewById(R.id.position) as TextView
-        //t.text = (position + 1).toString() + "."
+
         val p = favourites[position]
 
         val tvdesc = convertView.findViewById(R.id.favdec_s) as TextView
@@ -87,11 +89,8 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
 
         // Populate the data into the template view using the data object
         tvdesc.text = p.name
-        //tvHome.setImageResource(p.imageressource);
         tvpw.text = p.phone
-//        Picasso.with(mContext)
-//                .load(p.getImg())
-//                .into(tvHome)
+
 
         if (p.image!="no image") {
             val storage = FirebaseStorage.getInstance()
@@ -118,6 +117,7 @@ class ListViewAdapter(private val mContext: Context, private var favourites: Mut
     }
     private var disposable: Disposable? = null
 
+    //====================================== delete this restaurant from favourite in data base ======================================
     private fun delFav(id: Int, position: Int) {
 
         disposable =

@@ -12,7 +12,8 @@ import android.widget.ListView
 import android.widget.Toast
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.util.Attributes
-import com.mobelite.tourismguide.adapters.ListViewAdapter
+import com.mobelite.tourismguide.adapters.FavListViewAdapter
+import com.mobelite.tourismguide.adapters.FavOfflineListViewAdapter
 import com.mobelite.tourismguide.data.roomservice.database.RestaurantRepository
 import com.mobelite.tourismguide.data.roomservice.local.RestaurantDataBase
 import com.mobelite.tourismguide.data.roomservice.local.RestaurantDataSource
@@ -20,8 +21,6 @@ import com.mobelite.tourismguide.data.roomservice.model.Restaurant
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
 import com.mobelite.tourismguide.tools.PhoneGrantings
-import io.reactivex.Observable
-import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -30,8 +29,10 @@ import io.reactivex.schedulers.Schedulers
 
 class FavouriteFragment : Fragment() {
 
-    private var OfflineData: MutableList<Model.ResultRestaurant> = ArrayList()
-    private var mAdapter: ListViewAdapter? = null
+    private var OfflineData: MutableList<Restaurant> = ArrayList()
+    private var mAdapter: FavListViewAdapter? = null
+    private var mAdapterOfline: FavOfflineListViewAdapter? = null
+
     var list: ListView? = null
 
     //Room
@@ -49,44 +50,6 @@ class FavouriteFragment : Fragment() {
     }
     private var disposable: Disposable? = null
 
-    private fun selectFav() {
-
-
-        val restaurantDataBase = RestaurantDataBase.getInstance(activity!!)
-        restaurantRepository = RestaurantRepository.getInstance(RestaurantDataSource.getInstance(restaurantDataBase.restaurantDAO()))
-        deleteAllOfflineData()
-
-        disposable =
-                restaurantServices.selectfav(PhoneGrantings.getSharedId(context!!))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                { result ->
-                                    mAdapter = ListViewAdapter(context!!, result as MutableList<Model.ResultRestaurant>, activity)
-                                    mAdapter!!.mode = Attributes.Mode.Single
-                                    list!!.adapter = mAdapter
-                                    result.forEach { r ->
-                                        addOfflineRestaurant(Restaurant(r.id, r.name, r.phone, r.description, r.lat, r.lng, r.image, r.userid))
-                                        println("adding to room")
-                                    }
-
-                                },
-                                { error -> println(error.message) }
-                        )
-    }
-
-    private fun selectFavOffline() {
-        compositeDisposable = CompositeDisposable()
-        mAdapter = ListViewAdapter(activity!!, OfflineData, activity)
-        mAdapter!!.mode = Attributes.Mode.Single
-        list!!.adapter = mAdapter
-        val restaurantDataBase = RestaurantDataBase.getInstance(activity!!)
-        restaurantRepository = RestaurantRepository.getInstance(RestaurantDataSource.getInstance(restaurantDataBase.restaurantDAO()))
-//        deleteAllOfflineData()
-//        addOfflineRestaurant(Restaurant(0,"name","phone","desc","lat","lng","imag","user"))
-
-        loadOfflineData()
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -98,9 +61,9 @@ class FavouriteFragment : Fragment() {
 
         list = root.findViewById(R.id.flistfav) as ListView
 
-        if (PhoneGrantings.isNetworkAvailable(activity!!))
+        if (PhoneGrantings.isNetworkAvailable(activity!!)) // online actions
             selectFav()
-        else {
+        else {  // offline actions
             Toast.makeText(context, "Loading offline", Toast.LENGTH_SHORT).show()
 
             println("loading offline:")
@@ -146,8 +109,38 @@ class FavouriteFragment : Fragment() {
         return root
     }
 
+    //===================================== loading online data from data base =====================================
+    private fun selectFav() {
+        disposable =
+                restaurantServices.selectfav(PhoneGrantings.getSharedId(context!!))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { result ->
+                                    mAdapter = FavListViewAdapter(context!!, result as MutableList<Model.ResultRestaurant>, activity)
+                                    mAdapter!!.mode = Attributes.Mode.Single
+                                    list!!.adapter = mAdapter
+
+
+                                },
+                                { error -> println(error.message) }
+                        )
+    }
+
+    //===================================== loading offline data from room =====================================
+    private fun selectFavOffline() {
+        compositeDisposable = CompositeDisposable()
+        mAdapterOfline = FavOfflineListViewAdapter(activity!!, OfflineData, activity)
+        mAdapterOfline!!.mode = Attributes.Mode.Single
+        list!!.adapter = mAdapterOfline
+        val restaurantDataBase = RestaurantDataBase.getInstance(activity!!)
+        restaurantRepository = RestaurantRepository.getInstance(RestaurantDataSource.getInstance(restaurantDataBase.restaurantDAO()))
+
+        loadOfflineData()
+    }
+
     private fun loadOfflineData() {
-        val disposable = restaurantRepository!!.allRestaurants
+        val disposable = restaurantRepository!!.getFavourites()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({ restaurants -> onGetAllRestaurantSuccess(restaurants) }) { throwable ->
@@ -157,56 +150,15 @@ class FavouriteFragment : Fragment() {
         compositeDisposable!!.add(disposable)
     }
 
-
     private fun onGetAllRestaurantSuccess(restaurants: List<Restaurant>?) {
-        OfflineData.clear()
-        val rests: ArrayList<Model.ResultRestaurant> = ArrayList()
-        restaurants!!.forEach { r ->
-            val rest = Model.ResultRestaurant(r.ID, r.Name!!, r.Phone!!, r.Desc!!, r.Lat!!, r.Lng!!, r.Image!!, r.UserID!!)
-            rests.add(rest)
 
+        if (restaurants!=null) {
+            OfflineData.clear()
+
+            OfflineData.addAll(restaurants)
         }
-        OfflineData.addAll(rests)
         println(restaurants.toString())
-        mAdapter!!.notifyDataSetChanged()
-    }
-
-    private fun deleteAllOfflineData() {
-        val disposable = Observable.create(ObservableOnSubscribe<Any> { e ->
-            restaurantRepository!!.deleteAll()
-            e.onComplete()
-        })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({ },
-                        { throwable ->
-                            Toast.makeText(context, throwable.message, Toast.LENGTH_SHORT).show()
-                        },
-                        { })
-        if (!PhoneGrantings.isNetworkAvailable(activity!!))
-            compositeDisposable!!.addAll(disposable)
-    }
-
-
-    private fun addOfflineRestaurant(restaurant: Restaurant) {
-        val disposable = Observable.create(ObservableOnSubscribe<Any> { e ->
-            println(restaurant)
-            restaurantRepository!!.insertRestaurant(restaurant)
-            e.onComplete()
-        })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({ },
-                        { throwable ->
-                            Toast.makeText(context, "" + throwable.message, Toast.LENGTH_SHORT).show()
-                        },
-                        {
-                            //                            loadOfflineData()
-                        })
-        if (!PhoneGrantings.isNetworkAvailable(activity!!))
-            compositeDisposable!!.addAll(disposable)
-
-
+        mAdapterOfline!!.notifyDataSetChanged()
     }
 
     override fun onDestroy() {

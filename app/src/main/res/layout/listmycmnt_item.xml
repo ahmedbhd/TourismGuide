@@ -67,7 +67,7 @@
             android:layout_weight="0.15"
             android:background="@android:drawable/screen_background_light"
             android:text="Delete"
-            android:textColor="?attr/colorError" />
+            />
     </LinearLayout>
 
 </LinearLayout>

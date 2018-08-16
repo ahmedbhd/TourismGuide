@@ -35,10 +35,6 @@ import java.util.*
 class SaveResActivity : AppCompatActivity(),
         MapDialogFragment.MapDialogFragmentListener {
 
-    companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-
-    }
 
     private val REQUEST_RUNTIME_PERMISSION = 123
 
@@ -54,34 +50,6 @@ class SaveResActivity : AppCompatActivity(),
         RestaurantServices.create()
     }
     private var disposable: Disposable? = null
-
-    private fun updateRestaurant() {
-
-
-        r = Model.ResultRestaurant(r!!.id, Upname.text.toString(), Uptlf.text.toString(), UpDesc.text.toString(), origin!!.latitude.toString(), origin!!.longitude.toString(), r!!.image, PhoneGrantings.getSharedId(applicationContext))
-
-        disposable =
-                restaurantServices.updaterest(r!!)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                { result ->
-                                    run {
-
-                                        println(result)
-                                        if (result=="ok") {
-
-                                            Toast.makeText(this, "Updated succeeded", Toast.LENGTH_SHORT).show()
-
-                                        }
-                                    }
-                                },
-                                { error -> println(error.message) }
-                        )
-        val intent = Intent(this, MainActivity().javaClass)
-        startActivity(intent)
-
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,6 +75,8 @@ class SaveResActivity : AppCompatActivity(),
         }
         upactivitytitle.text = "New Restaurant"
 
+
+        //================================ load data for update ================================
         if (intent.hasExtra("myObject")) {
             val ss: String = intent.getStringExtra("myObject")
             r = Gson().fromJson(ss, Model.ResultRestaurant::class.java)
@@ -130,33 +100,44 @@ class SaveResActivity : AppCompatActivity(),
             UpSave.setImageDrawable(getDrawable(R.drawable.update))
         }
 
+        //================================ action to upload image ================================
         Uplocimage_d.setOnClickListener {
-            if (CheckPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                // you have permission go ahead
-                showFileChooser()
-            } else {
-                // you do not have permission go request runtime permissions
-                RequestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_RUNTIME_PERMISSION);
+            when {
+                (!PhoneGrantings.isNetworkAvailable(applicationContext))
+                -> Toast.makeText(this, "Internet is required for this feature", Toast.LENGTH_SHORT).show()
+                (CheckPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    // you have permission go ahead
+                -> showFileChooser()
+                else
+                    // you do not have permission go request runtime permissions
+                ->
+                    RequestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_RUNTIME_PERMISSION);
+
             }
 
         }
 
+        //================================ action to save data ================================
         UpSave.setOnClickListener {
             when {
-                (Uptlf.text.toString()=="" || Uptlf!!.text.toString()=="" || UpDesc!!.text.toString()=="")
+                (!PhoneGrantings.isNetworkAvailable(applicationContext)) // check for internet connection
+                -> Toast.makeText(this, "Internet is required for this feature", Toast.LENGTH_SHORT).show()
+                (Uptlf.text.toString()=="" || Uptlf!!.text.toString()=="" || UpDesc!!.text.toString()=="") // check all fields
                 -> Toast.makeText(this, "All the fields are required", Toast.LENGTH_SHORT).show()
-                (!Validators.isPhone(Uptlf.text.toString()))
+                (!Validators.isPhone(Uptlf.text.toString())) // check if validated phone number
                 -> Toast.makeText(this, "Bad phone number", Toast.LENGTH_SHORT).show()
                 else -> {
-                    if (intent.hasExtra("myObject")) {
-                        if (filePath!=null) {
+                    if (intent.hasExtra("myObject")) { //check if update is called
+                        if (filePath!=null) { // check if image os updated
                             uploadFile()
                         } else
                             updateRestaurant()
                     } else {
                         when {
-                            origin==null -> Toast.makeText(this, "The location of the restaurant is Required", Toast.LENGTH_SHORT).show()
-                            filePath==null -> addRestaurant("no image")
+                            origin==null // check if restaurant's location has been added
+                            -> Toast.makeText(this, "The location of the restaurant is Required", Toast.LENGTH_SHORT).show()
+                            filePath==null // check if image has been chosen
+                            -> addRestaurant("no image")
                             else -> uploadFile()
                         }
                     }
@@ -168,6 +149,7 @@ class SaveResActivity : AppCompatActivity(),
 
     private var filePath: Uri? = null
 
+    //================================ show the image picker ================================
     private fun showFileChooser() {
         val intent = Intent()
         intent.type = "image/*"
@@ -177,6 +159,7 @@ class SaveResActivity : AppCompatActivity(),
 
     private val PICK_IAMGE_REQUEST = 1234
 
+    //================================ retreaving the image from phone ================================
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode==PICK_IAMGE_REQUEST &&
@@ -192,9 +175,12 @@ class SaveResActivity : AppCompatActivity(),
         }
     }
 
+
+    //================================ upload image to firebase ================================
     private fun uploadFile() {
         storage = FirebaseStorage.getInstance()
         storageRef = storage!!.reference
+        //================================ delete old image from firebase in case of update ================================
         if (intent.hasExtra("myObject")) {
             if (r!!.image!="no image") {
                 val imageRef2 = storageRef!!.child(r!!.image)
@@ -208,6 +194,7 @@ class SaveResActivity : AppCompatActivity(),
             }
         }
 
+        //================================ saving new image ================================
         val progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Loading ....")
         progressDialog.show()
@@ -236,19 +223,20 @@ class SaveResActivity : AppCompatActivity(),
 
     }
 
+    //================================ show the restaurant location in dialog fragment
     private fun showAlertDialog() {
         val fm = supportFragmentManager
-        if (intent.hasExtra("myObject")) {
-            val alertDialog = MapDialogFragment().newInstance("Maps", r!!.lat.toDouble(), r!!.lng.toDouble(), 3)
+        if (intent.hasExtra("myObject")) { // in case of update
+            val alertDialog = MapDialogFragment().newInstance("Maps", r!!.lat.toDouble(), r!!.lng.toDouble(), 3, r!!.image)
             alertDialog.show(fm, "fragment_alert")
-        } else {
-            val alertDialog = MapDialogFragment().newInstance("Maps", 35.771261, 10.834128, 0)
+        } else {                                // in case of adding new restaurant
+            val alertDialog = MapDialogFragment().newInstance("Maps", 35.771261, 10.834128, 0, "no image")
             alertDialog.show(fm, "fragment_alert")
         }
     }
 
+    //================================ retreaving chosen location from dialog fragment ================================
     override fun onFinishEditDialog(pos: LatLng) {
-//        Toast.makeText(this, "Hi, $pos", Toast.LENGTH_SHORT).show();
         origin = pos
     }
 
@@ -272,6 +260,7 @@ class SaveResActivity : AppCompatActivity(),
     }
 
 
+    //================================ save  new restaurant to data base ================================
     private fun addRestaurant(image: String) {
 
 
@@ -287,6 +276,36 @@ class SaveResActivity : AppCompatActivity(),
                                         if (result=="ok") {
 
                                             Toast.makeText(this, "Add succeeded", Toast.LENGTH_SHORT).show()
+
+                                        }
+                                    }
+                                },
+                                { error -> println(error.message) }
+                        )
+        val intent = Intent(this, MainActivity().javaClass)
+        startActivity(intent)
+
+    }
+
+    //================================ update restaurant to data base ================================
+
+    private fun updateRestaurant() {
+
+
+        r = Model.ResultRestaurant(r!!.id, Upname.text.toString(), Uptlf.text.toString(), UpDesc.text.toString(), origin!!.latitude.toString(), origin!!.longitude.toString(), r!!.image, PhoneGrantings.getSharedId(applicationContext))
+
+        disposable =
+                restaurantServices.updaterest(r!!)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { result ->
+                                    run {
+
+                                        println(result)
+                                        if (result=="ok") {
+
+                                            Toast.makeText(this, "Updated succeeded", Toast.LENGTH_SHORT).show()
 
                                         }
                                     }

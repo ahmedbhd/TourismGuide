@@ -9,6 +9,7 @@ import android.util.Log
 class PhoneGrantings {
 
     companion object {
+        //======================================  check if internet is available ======================================
          fun isNetworkAvailable(context: Context): Boolean {
              val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
              val activeNetworkInfo = connectivityManager.activeNetworkInfo
@@ -18,7 +19,7 @@ class PhoneGrantings {
 
         }
 
-
+        //====================================== get the user's id from shared preferences ======================================
         fun getSharedId(context:  Context) : String {
             val prefs = context.getSharedPreferences("FacebookProfile", ContextWrapper.MODE_PRIVATE)
             return prefs.getString("fb_id", null)

@@ -59,14 +59,18 @@ class HomeListAdapter(private val mContext: Context, private var favourites: Mut
 
         swipeLayout.setOnDoubleClickListener { _, _ -> Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show() }
 
+        // delete action is only available online
         v!!.findViewById<Button>(R.id.delete).setOnClickListener {
-            Toast.makeText(mContext, "clicked delete", Toast.LENGTH_SHORT).show()
-            delRestaurant(favourites[position].id, position)
+            if (!PhoneGrantings.isNetworkAvailable(mContext))
+                Toast.makeText(mContext, "Internet is required for this feature", Toast.LENGTH_SHORT).show()
+            else {
+                delRestaurant(favourites[position].id, position)
+            }
+
 
         }
 
         v!!.findViewById<Button>(R.id.open).setOnClickListener {
-            //Toast.makeText(mContext, "click open", Toast.LENGTH_SHORT).show();
             val intent = Intent(mContext, SaveResActivity().javaClass)
             val res: Model.ResultRestaurant? = favourites[position]
             println("res ${res.toString()}")
@@ -79,8 +83,7 @@ class HomeListAdapter(private val mContext: Context, private var favourites: Mut
 
     @SuppressLint("SetTextI18n")
     override fun fillValues(position: Int, convertView: View) {
-//        val t = convertView.findViewById(R.id.position) as TextView
-//        t.text = (position + 1).toString() + "."
+
         val p = favourites[position]
 
         val tvdesc = convertView.findViewById(R.id.favdec_s) as TextView
@@ -89,11 +92,7 @@ class HomeListAdapter(private val mContext: Context, private var favourites: Mut
 
         // Populate the data into the template view using the data object
         tvdesc.text = p.name
-        //tvHome.setImageResource(p.imageressource);
         tvpw.text = p.phone
-//        Picasso.with(mContext)
-//                .load(p.getImg())
-//                .into(tvHome)
 
         if (p.image!="no image") {
             val storage = FirebaseStorage.getInstance()
@@ -122,7 +121,8 @@ class HomeListAdapter(private val mContext: Context, private var favourites: Mut
     private var disposable: Disposable? = null
 
     private fun delRestaurant(id: Int, position: Int) {
-        if (favourites[position].image!="no image") {
+
+        if (favourites[position].image!="no image") { // deleting the image from firebase if it exists
             val storage = FirebaseStorage.getInstance()
             val storageRef = storage.reference
             val imageRef2 = storageRef.child(favourites[position].image)

@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 
-class TextViewDiagFrag() : DialogFragment() {
+class TextViewDiagFrag : DialogFragment() {
     fun newInstance(title: String): TextViewDiagFrag {
         val frag = TextViewDiagFrag()
         val args = Bundle()

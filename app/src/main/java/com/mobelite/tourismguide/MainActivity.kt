@@ -71,21 +71,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val id = item!!.itemId
-        if (id==R.id.disconnect) {
-//            if (AccessToken.getCurrentAccessToken()!=null) {
-//                GraphRequest(AccessToken.getCurrentAccessToken(), "/me/permissions/", null, HttpMethod.DELETE, GraphRequest.Callback {
-//                    AccessToken.setCurrentAccessToken(null)
-//                    LoginManager.getInstance().logOut()
-//
-//                    //finish()
-//                }).executeAsync()
-//
-//            }
+        if (id==R.id.disconnect) { // disconnect action
+
             val preferences = getSharedPreferences("FacebookProfile", Context.MODE_PRIVATE)
             val editor = preferences.edit()
             editor.clear()
             editor.apply()
-            println("discooooooooooooooooo")
             if (loginManager!=null) {
                 loginManager!!.logOut()
             }

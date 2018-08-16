@@ -19,11 +19,11 @@ import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 
-class CommentFragment : DialogFragment() {
+class CommentDiagFragment : DialogFragment() {
 
     companion object {
-        fun newInstance(id: String): CommentFragment {
-            val frag = CommentFragment()
+        fun newInstance(id: String): CommentDiagFragment {
+            val frag = CommentDiagFragment()
             val args = Bundle()
             args.putString("id", id)
 
@@ -51,12 +51,18 @@ class CommentFragment : DialogFragment() {
         list = root.findViewById(R.id.cmntlist)
 
         val save = root.findViewById<Button>(R.id.savecmnt)
+
         cmnt = root.findViewById(R.id.cmnttext)
+
         save.setOnClickListener {
-            if (cmnt!!.text.isEmpty())
-                Toast.makeText(activity!!, "Empty Comment", Toast.LENGTH_SHORT).show()
-            else
-                insertCmnt()
+            when {
+                (!PhoneGrantings.isNetworkAvailable(context!!))
+                -> Toast.makeText(context, "Internet is required for this feature", Toast.LENGTH_SHORT).show()
+                (cmnt!!.text.isEmpty())
+                -> Toast.makeText(activity!!, "Empty Comment", Toast.LENGTH_SHORT).show()
+                else
+                -> insertCmnt()
+            }
         }
 
         allcomments = root.findViewById(R.id.allcmnts)
@@ -76,6 +82,7 @@ class CommentFragment : DialogFragment() {
     }
 
 
+    //====================================== load all comments of this restaurant from data base ======================================
     private fun getAllComments() {
 
 
@@ -96,6 +103,7 @@ class CommentFragment : DialogFragment() {
                         )
     }
 
+    //====================================== load all my comments of this restaurant ======================================
     private fun getMyComments() {
 
         println(PhoneGrantings.getSharedId(context!!))
@@ -116,6 +124,7 @@ class CommentFragment : DialogFragment() {
                         )
     }
 
+    //====================================== add comment to data base ======================================
     private fun insertCmnt() {
 
 

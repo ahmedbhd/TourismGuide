@@ -16,6 +16,14 @@ class RestaurantDataSource(private val restaurantDAO: RestaurantDAO) : IRestaura
         restaurantDAO.insertRestaurant(*restaurant)
     }
 
+    override fun getFavourites(): Flowable<List<Restaurant>>{
+        return restaurantDAO.getFavourites()
+    }
+
+    override fun getMyRestaurants(id: String): Flowable<List<Restaurant>> {
+        return restaurantDAO.getMyRestaurants(id)
+    }
+
 //    override fun updateRestaurant(vararg restaurant: Restaurant) {
 //        restaurantDAO.updateRestaurant(* restaurant)
 //    }
