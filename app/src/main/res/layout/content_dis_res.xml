@@ -166,7 +166,7 @@
             android:layout_marginBottom="0dp"
             android:gravity="bottom|center"
             app:backgroundTint="@android:color/holo_red_dark"
-            app:srcCompat="@drawable/empty_heart"
+            app:srcCompat="@drawable/heart"
             tools:layout_editor_absoluteX="172dp"
             tools:layout_editor_absoluteY="478dp" />
     </RelativeLayout>

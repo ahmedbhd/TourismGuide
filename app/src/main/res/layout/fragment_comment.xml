@@ -31,13 +31,13 @@
 
         <Button
             android:id="@+id/savecmnt"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="4dp"
-            android:layout_weight="0.4"
-            android:background="@android:drawable/screen_background_light"
+            android:background="?attr/colorButtonNormal"
             android:padding="2dp"
-            android:text="Save"
+            android:text="SAVE"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textColor="@android:color/holo_orange_dark"
             android:textSize="30sp" />

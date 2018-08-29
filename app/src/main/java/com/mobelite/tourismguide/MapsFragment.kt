@@ -135,6 +135,8 @@ class MapsFragment : Fragment(),
         searchBar!!.onActionViewExpanded()
         searchBar!!.isIconified = false
         searchBar!!.clearFocus()
+        searchBar!!.isFocusable = false
+
         searchBar!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener { // searching restaurant by name in real time
             override fun onQueryTextSubmit(query: String): Boolean {
                 return false

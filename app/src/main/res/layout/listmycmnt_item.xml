@@ -50,24 +50,24 @@
 
         <Button
             android:id="@+id/savemycmnt"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1.5"
-            android:background="@android:drawable/screen_background_light"
-            android:text="Update"
+            android:text="UPDATE"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textColor="@android:color/holo_green_dark"
             android:textSize="30sp" />
 
         <Button
             android:id="@+id/deletemycmnt"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:layout_weight="0.15"
-            android:background="@android:drawable/screen_background_light"
             android:text="Delete"
-            />
+            android:textColor="@android:color/holo_red_dark" />
     </LinearLayout>
 
 </LinearLayout>

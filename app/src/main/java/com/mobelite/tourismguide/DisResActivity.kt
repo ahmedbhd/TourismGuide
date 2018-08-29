@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.text.method.LinkMovementMethod
 import android.view.MenuItem
@@ -16,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
+import com.mobelite.tourismguide.R.id.*
 import com.mobelite.tourismguide.data.roomservice.model.Restaurant
 import com.mobelite.tourismguide.data.webservice.Model
 import com.mobelite.tourismguide.data.webservice.RestaurantServices
@@ -39,6 +41,7 @@ class DisResActivity : AppCompatActivity(),
     }
 
     var r: Model.ResultRestaurant? = null
+    var isitfav:Boolean = false
 
     private var storage: FirebaseStorage? = null
     private var storageRef: StorageReference? = null
@@ -99,8 +102,16 @@ class DisResActivity : AppCompatActivity(),
                 alertDialog.show(fm, "comments list")
             }
 
+            isFav()
+
+            cmntnbr.movementMethod = LinkMovementMethod.getInstance()
+
+
             disfav.setOnClickListener {
-                addFavourite()
+               if (isitfav)
+                    delFav()
+                else
+                   addFavourite()
             }
 
             //rating bar actions
@@ -189,9 +200,6 @@ class DisResActivity : AppCompatActivity(),
 
 
 
-        isFav()
-
-        cmntnbr.movementMethod = LinkMovementMethod.getInstance()
 
 
         //simpleRatingBar.isClickable = true
@@ -214,8 +222,32 @@ class DisResActivity : AppCompatActivity(),
                                         println(result)
                                         if (result=="ok") {
                                             println("done")
-                                            Toast.makeText(this, "Favourite succeeded", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(this, "Favourite added", Toast.LENGTH_SHORT).show()
 
+                                        }
+                                    }
+                                },
+                                { error -> println(error.message) }
+                        )
+        val intent = Intent(this, MainActivity().javaClass)
+        startActivity(intent)
+    }
+
+    //===================================== delete from favourite =====================================
+    private fun delFav() {
+
+        disposable =
+                restaurantServices.deletefav(PhoneGrantings.getSharedId(this), r!!.id.toString())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { result ->
+                                    run {
+
+                                        println(result)
+                                        if (result=="ok") {
+
+                                            Toast.makeText(this, "Delete succeeded", Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 },
@@ -238,14 +270,20 @@ class DisResActivity : AppCompatActivity(),
                                         run {
 
                                             println("is faaaaaaaaaaa55555555aaaaaaaaaaaav $result")
-                                            if (result.toInt() > 0) disfav.setImageResource(R.drawable.heart)
+                                            if (result.toInt() > 0) {
+                                                disfav.setImageResource(R.drawable.empty_heart)
+                                                isitfav = true
+                                            }
                                         }
 
                                     },
                                     { error -> println(error.message) }
                             )
         else {
-            if (offlineRestaurant!!.Fav!! > 0) disfav.setImageResource(R.drawable.heart)
+            if (offlineRestaurant!!.Fav!! > 0) {
+                disfav.setImageResource(R.drawable.empty_heart)
+                isitfav = true
+            }
         }
 
     }

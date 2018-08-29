@@ -26,6 +26,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_margin="@dimen/fab_margin"
+        android:focusable="false"
+        android:iconifiedByDefault="false"
+
         app:srcCompat="@drawable/ic_add_circle_outline_red_50_24dp" />
 
     <com.google.android.gms.maps.MapView
